@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Flow>
+  <Node
+    Id="16B35666"
+    Type="KeyPressed"
+    Designer.Name="16b35666"
+    Key="Space"
+    Designer.OffsetX="88"
+    Designer.OffsetY="363.04" />
+  <Node
+    Id="1758CD83"
+    Type="CompareInt32"
+    Designer.Name="1758cd83"
+    A="0"
+    B="1"
+    Designer.OffsetX="529"
+    Designer.OffsetY="365.04" />
+  <Node
+    Id="17B2CC9F"
+    Type="QueryMenuState"
+    Designer.Name="17b2cc9f"
+    Designer.OffsetX="85"
+    Designer.OffsetY="106.04" />
+  <Node
+    Id="16B6CA18"
+    Type="UseWeapon"
+    Designer.Name="16b6ca18"
+    Designer.OffsetX="1475"
+    Designer.OffsetY="257.04" />
+  <Node
+    Id="180FAB44"
+    Type="CompareInt32"
+    Designer.Name="180fab44"
+    A="0"
+    B="1"
+    Designer.OffsetX="297"
+    Designer.OffsetY="185.04" />
+  <Node
+    Id="1FE39BC2"
+    Type="Spawn"
+    Designer.Name="1fe39bc2"
+    SpawnClass="enemy_05_ur"
+    SpawnScale="1 1 1"
+    SpawnOrientation="0 0 0 1"
+    SpawnPoint="3136 214 0"
+    Designer.OffsetX="2476.49687385068"
+    Designer.OffsetY="2329.76507539537" />
+  <Node
+    Id="1893C15A"
+    Type="KeyPressed"
+    Designer.Name="1893c15a"
+    Key="M"
+    Designer.OffsetX="91"
+    Designer.OffsetY="538.04" />
+  <Node
+    Id="191C6200"
+    Type="GFXSetVariable"
+    Designer.Name="191c6200"
+    Movie="0"
+    Variable="health"
+    Value="50"
+    Designer.OffsetX="500"
+    Designer.OffsetY="737.04" />
+  <Node
+    Id="19F091EE"
+    Type="Signal"
+    Designer.Name="HealthChanged"
+    Designer.OffsetX="86"
+    Designer.OffsetY="718.04" />
+  <Node
+    Id="1A4181EB"
+    Type="ChangeHealth"
+    Designer.Name="1a4181eb"
+    Unit="0"
+    Amount="20"
+    Designer.OffsetX="307"
+    Designer.OffsetY="575.04" />
+  <Node
+    Id="19EE8EA9"
+    Type="QueryHealthOfUnit"
+    Designer.Name="19ee8ea9"
+    Unit="0"
+    Current="0"
+    Maximum="0"
+    Designer.OffsetX="307"
+    Designer.OffsetY="737.04" />
+  <Node
+    Id="1C2443F1"
+    Type="GFXSetVariable"
+    Designer.Name="1c2443f1"
+    Movie="0"
+    Variable="gameover"
+    Value="1"
+    Designer.OffsetX="303"
+    Designer.OffsetY="921.95930795848" />
+  <Node
+    Id="1D53EAAE"
+    Type="Signal"
+    Designer.Name="Death"
+    Designer.OffsetX="81"
+    Designer.OffsetY="970.04" />
+  <Node
+    Id="19A1C59E"
+    Type="CompareInt32"
+    Designer.Name="19a1c59e"
+    A="0"
+    B="0"
+    Designer.OffsetX="1237"
+    Designer.OffsetY="123.04" />
+  <Node
+    Id="1A368D86"
+    Type="GFXGetVariable"
+    Designer.Name="1a368d86"
+    Movie="0"
+    Variable="gameover"
+    Value="0"
+    Designer.OffsetX="515"
+    Designer.OffsetY="60.04" />
+  <Node
+    Id="1A8BE14D"
+    Type="CompareInt32"
+    Designer.Name="1a8be14d"
+    A="0"
+    B="0"
+    Designer.OffsetX="1246"
+    Designer.OffsetY="400.04" />
+  <Node
+    Id="1B6473B8"
+    Type="ChangeMenuState"
+    Designer.Name="1b6473b8"
+    StateId="3"
+    Designer.OffsetX="1475"
+    Designer.OffsetY="397.04" />
+  <Node
+    Id="1A9946D5"
+    Type="Signal"
+    Designer.Name="LeaveViewport"
+    Designer.OffsetX="87.8838352796558"
+    Designer.OffsetY="1141.04" />
+  <Node
+    Id="1B571A34"
+    Type="GFXGetVariable"
+    Designer.Name="1b571a34"
+    Movie="0"
+    Variable="gamewon"
+    Value="0"
+    Designer.OffsetX="740.883835279656"
+    Designer.OffsetY="153.04" />
+  <Node
+    Id="1BA46900"
+    Type="AddInt32"
+    Designer.Name="1ba46900"
+    A="0"
+    B="0"
+    C="0"
+    Designer.OffsetX="974.883835279656"
+    Designer.OffsetY="92.04" />
+  <Connection
+    Source="1758CD83.In"
+    Target="16B35666.Released"
+    Type="Element" />
+  <Connection
+    Source="180FAB44.In"
+    Target="16B35666.Pressed"
+    Type="Element" />
+  <Connection
+    Source="180FAB44.A"
+    Target="17B2CC9F.Value"
+    SourceType="In"
+    TargetType="Out"
+    Type="Property" />
+  <Connection
+    Source="1A4181EB.In"
+    Target="1893C15A.Released"
+    Type="Element" />
+  <Connection
+    Source="191C6200.In"
+    Target="19EE8EA9.Succeeded"
+    Type="Element" />
+  <Connection
+    Source="19EE8EA9.In"
+    Target="19F091EE.Out"
+    Type="Element" />
+  <Connection
+    Source="191C6200.Value"
+    Target="19EE8EA9.Current"
+    SourceType="In"
+    TargetType="Out"
+    Type="Property" />
+  <Connection
+    Source="1C2443F1.In"
+    Target="1D53EAAE.Out"
+    Type="Element" />
+  <Connection
+    Source="1A8BE14D.In"
+    Target="1758CD83.A == B"
+    Type="Element" />
+  <Connection
+    Source="1A368D86.In"
+    Target="180FAB44.A == B"
+    Type="Element" />
+  <Connection
+    Source="1758CD83.A"
+    Target="180FAB44.A"
+    SourceType="In"
+    TargetType="Out"
+    Type="Property" />
+  <Connection
+    Source="1C2443F1.In"
+    Target="1A9946D5.Out"
+    Type="Element" />
+  <Connection
+    Source="1BA46900.A"
+    Target="1A368D86.Value"
+    SourceType="In"
+    TargetType="Out"
+    Type="Property" />
+  <Connection
+    Source="1BA46900.B"
+    Target="1B571A34.Value"
+    SourceType="In"
+    TargetType="Out"
+    Type="Property" />
+  <Connection
+    Source="1B571A34.In"
+    Target="1A368D86.Out"
+    Type="Element" />
+  <Connection
+    Source="19A1C59E.A"
+    Target="1BA46900.C"
+    SourceType="In"
+    TargetType="Out"
+    Type="Property" />
+  <Connection
+    Source="1A8BE14D.A"
+    Target="1BA46900.C"
+    SourceType="In"
+    TargetType="Out"
+    Type="Property" />
+  <Connection
+    Source="16B6CA18.StartFire"
+    Target="19A1C59E.A == B"
+    Type="Element" />
+  <Connection
+    Source="16B6CA18.EndFire"
+    Target="1A8BE14D.A == B"
+    Type="Element" />
+  <Connection
+    Source="1B6473B8.In"
+    Target="1A8BE14D.A != B"
+    Type="Element" />
+  <Connection
+    Source="1BA46900.In"
+    Target="1B571A34.Out"
+    Type="Element" />
+  <Connection
+    Source="19A1C59E.In"
+    Target="1BA46900.Out"
+    Type="Element" />
+</Flow>

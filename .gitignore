@@ -11,3 +11,12 @@
 *.lai
 *.la
 *.a
+
+Release
+Debug
+*.ncb
+*.suo
+*.ilk
+*.pdb
+*.exe
+*.user

@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Flow>
+
+  <Type Name="int" Editor="MyParam6"/>
+  <Type Name="float" Editor="MyParam6"/>
+  <Type Name="quaternion" Editor="MyParam5"/>
+  <Type Name="vector3" Editor="MyParam3"/>
+  <Type Name="bool" Editor="MyParam7"/>
+
+  <Enum Name="TypeKeyPressed" Editor="MyParam2">
+    <Member Name="A" Value="0x41" />
+    <Member Name="Add" Value="0x6b" />
+    <Member Name="Alt" Value="0x40000" />
+    <Member Name="Apps" Value="0x5d" />
+    <Member Name="Attn" Value="0xf6" />
+    <Member Name="B" Value="0x42" />
+    <Member Name="Back" Value="8" />
+    <Member Name="BrowserBack" Value="0xa6" />
+    <Member Name="BrowserFavorites" Value="0xab" />
+    <Member Name="BrowserForward" Value="0xa7" />
+    <Member Name="BrowserHome" Value="0xac" />
+    <Member Name="BrowserRefresh" Value="0xa8" />
+    <Member Name="BrowserSearch" Value="170" />
+    <Member Name="BrowserStop" Value="0xa9" />
+    <Member Name="C" Value="0x43" />
+    <Member Name="Cancel" Value="3" />
+    <Member Name="Capital" Value="20" />
+    <Member Name="CapsLock" Value="20" />
+    <Member Name="Clear" Value="12" />
+    <Member Name="Control" Value="0x20000" />
+    <Member Name="ControlKey" Value="0x11" />
+    <Member Name="Crsel" Value="0xf7" />
+    <Member Name="D" Value="0x44" />
+    <Member Name="D0" Value="0x30" />
+    <Member Name="D1" Value="0x31" />
+    <Member Name="D2" Value="50" />
+    <Member Name="D3" Value="0x33" />
+    <Member Name="D4" Value="0x34" />
+    <Member Name="D5" Value="0x35" />
+    <Member Name="D6" Value="0x36" />
+    <Member Name="D7" Value="0x37" />
+    <Member Name="D8" Value="0x38" />
+    <Member Name="D9" Value="0x39" />
+    <Member Name="Decimal" Value="110" />
+    <Member Name="Delete" Value="0x2e" />
+    <Member Name="Divide" Value="0x6f" />
+    <Member Name="Down" Value="40" />
+    <Member Name="E" Value="0x45" />
+    <Member Name="End" Value="0x23" />
+    <Member Name="Enter" Value="13" />
+    <Member Name="EraseEof" Value="0xf9" />
+    <Member Name="Escape" Value="0x1b" />
+    <Member Name="Execute" Value="0x2b" />
+    <Member Name="Exsel" Value="0xf8" />
+    <Member Name="F" Value="70" />
+    <Member Name="F1" Value="0x70" />
+    <Member Name="F10" Value="0x79" />
+    <Member Name="F11" Value="0x7a" />
+    <Member Name="F12" Value="0x7b" />
+    <Member Name="F13" Value="0x7c" />
+    <Member Name="F14" Value="0x7d" />
+    <Member Name="F15" Value="0x7e" />
+    <Member Name="F16" Value="0x7f" />
+    <Member Name="F17" Value="0x80" />
+    <Member Name="F18" Value="0x81" />
+    <Member Name="F19" Value="130" />
+    <Member Name="F2" Value="0x71" />
+    <Member Name="F20" Value="0x83" />
+    <Member Name="F21" Value="0x84" />
+    <Member Name="F22" Value="0x85" />
+    <Member Name="F23" Value="0x86" />
+    <Member Name="F24" Value="0x87" />
+    <Member Name="F3" Value="0x72" />
+    <Member Name="F4" Value="0x73" />
+    <Member Name="F5" Value="0x74" />
+    <Member Name="F6" Value="0x75" />
+    <Member Name="F7" Value="0x76" />
+    <Member Name="F8" Value="0x77" />
+    <Member Name="F9" Value="120" />
+    <Member Name="FinalMode" Value="0x18" />
+    <Member Name="G" Value="0x47" />
+    <Member Name="H" Value="0x48" />
+    <Member Name="HanguelMode" Value="0x15" />
+    <Member Name="HangulMode" Value="0x15" />
+    <Member Name="HanjaMode" Value="0x19" />
+    <Member Name="Help" Value="0x2f" />
+    <Member Name="Home" Value="0x24" />
+    <Member Name="I" Value="0x49" />
+    <Member Name="IMEAccept" Value="30" />
+    <Member Name="IMEAceept" Value="30" />
+    <Member Name="IMEConvert" Value="0x1c" />
+    <Member Name="IMEModeChange" Value="0x1f" />
+    <Member Name="IMENonconvert" Value="0x1d" />
+    <Member Name="Insert" Value="0x2d" />
+    <Member Name="J" Value="0x4a" />
+    <Member Name="JunjaMode" Value="0x17" />
+    <Member Name="K" Value="0x4b" />
+    <Member Name="KanaMode" Value="0x15" />
+    <Member Name="KanjiMode" Value="0x19" />
+    <Member Name="KeyCode" Value="0xffff" />
+    <Member Name="L" Value="0x4c" />
+    <Member Name="LaunchApplication1" Value="0xb6" />
+    <Member Name="LaunchApplication2" Value="0xb7" />
+    <Member Name="LaunchMail" Value="180" />
+    <Member Name="LButton" Value="1" />
+    <Member Name="LControlKey" Value="0xa2" />
+    <Member Name="Left" Value="0x25" />
+    <Member Name="LineFeed" Value="10" />
+    <Member Name="LMenu" Value="0xa4" />
+    <Member Name="LShiftKey" Value="160" />
+    <Member Name="LWin" Value="0x5b" />
+    <Member Name="M" Value="0x4d" />
+    <Member Name="MButton" Value="4" />
+    <Member Name="MediaNextTrack" Value="0xb0" />
+    <Member Name="MediaPlayPause" Value="0xb3" />
+    <Member Name="MediaPreviousTrack" Value="0xb1" />
+    <Member Name="MediaStop" Value="0xb2" />
+    <Member Name="Menu" Value="0x12" />
+    <Member Name="Multiply" Value="0x6a" />
+    <Member Name="N" Value="0x4e" />
+    <Member Name="Next" Value="0x22" />
+    <Member Name="NoName" Value="0xfc" />
+    <Member Name="None" Value="0" />
+    <Member Name="NumLock" Value="0x90" />
+    <Member Name="NumPad0" Value="0x60" />
+    <Member Name="NumPad1" Value="0x61" />
+    <Member Name="NumPad2" Value="0x62" />
+    <Member Name="NumPad3" Value="0x63" />
+    <Member Name="NumPad4" Value="100" />
+    <Member Name="NumPad5" Value="0x65" />
+    <Member Name="NumPad6" Value="0x66" />
+    <Member Name="NumPad7" Value="0x67" />
+    <Member Name="NumPad8" Value="0x68" />
+    <Member Name="NumPad9" Value="0x69" />
+    <Member Name="O" Value="0x4f" />
+    <Member Name="Oem1" Value="0xba" />
+    <Member Name="Oem102" Value="0xe2" />
+    <Member Name="Oem2" Value="0xbf" />
+    <Member Name="Oem3" Value="0xc0" />
+    <Member Name="Oem4" Value="0xdb" />
+    <Member Name="Oem5" Value="220" />
+    <Member Name="Oem6" Value="0xdd" />
+    <Member Name="Oem7" Value="0xde" />
+    <Member Name="Oem8" Value="0xdf" />
+    <Member Name="OemBackslash" Value="0xe2" />
+    <Member Name="OemClear" Value="0xfe" />
+    <Member Name="OemCloseBrackets" Value="0xdd" />
+    <Member Name="Oemcomma" Value="0xbc" />
+    <Member Name="OemMinus" Value="0xbd" />
+    <Member Name="OemOpenBrackets" Value="0xdb" />
+    <Member Name="OemPeriod" Value="190" />
+    <Member Name="OemPipe" Value="220" />
+    <Member Name="Oemplus" Value="0xbb" />
+    <Member Name="OemQuestion" Value="0xbf" />
+    <Member Name="OemQuotes" Value="0xde" />
+    <Member Name="OemSemicolon" Value="0xba" />
+    <Member Name="Oemtilde" Value="0xc0" />
+    <Member Name="P" Value="80" />
+    <Member Name="Pa1" Value="0xfd" />
+    <Member Name="Packet" Value="0xe7" />
+    <Member Name="PageDown" Value="0x22" />
+    <Member Name="PageUp" Value="0x21" />
+    <Member Name="Pause" Value="0x13" />
+    <Member Name="Play" Value="250" />
+    <Member Name="Print" Value="0x2a" />
+    <Member Name="PrintScreen" Value="0x2c" />
+    <Member Name="Prior" Value="0x21" />
+    <Member Name="ProcessKey" Value="0xe5" />
+    <Member Name="Q" Value="0x51" />
+    <Member Name="R" Value="0x52" />
+    <Member Name="RButton" Value="2" />
+    <Member Name="RControlKey" Value="0xa3" />
+    <Member Name="Return" Value="13" />
+    <Member Name="Right" Value="0x27" />
+    <Member Name="RMenu" Value="0xa5" />
+    <Member Name="RShiftKey" Value="0xa1" />
+    <Member Name="RWin" Value="0x5c" />
+    <Member Name="S" Value="0x53" />
+    <Member Name="Scroll" Value="0x91" />
+    <Member Name="Select" Value="0x29" />
+    <Member Name="SelectMedia" Value="0xb5" />
+    <Member Name="Separator" Value="0x6c" />
+    <Member Name="Shift" Value="0x10000" />
+    <Member Name="ShiftKey" Value="0x10" />
+    <Member Name="Sleep" Value="0x5f" />
+    <Member Name="Snapshot" Value="0x2c" />
+    <Member Name="Space" Value="0x20" />
+    <Member Name="Subtract" Value="0x6d" />
+    <Member Name="T" Value="0x54" />
+    <Member Name="Tab" Value="9" />
+    <Member Name="U" Value="0x55" />
+    <Member Name="Up" Value="0x26" />
+    <Member Name="V" Value="0x56" />
+    <Member Name="VolumeDown" Value="0xae" />
+    <Member Name="VolumeMute" Value="0xad" />
+    <Member Name="VolumeUp" Value="0xaf" />
+    <Member Name="W" Value="0x57" />
+    <Member Name="X" Value="0x58" />
+    <Member Name="XButton1" Value="5" />
+    <Member Name="XButton2" Value="6" />
+    <Member Name="Y" Value="0x59" />
+    <Member Name="Z" Value="90" />
+    <Member Name="Zoom" Value="0xfb" />
+  </Enum>
+
+  <Node Name="Comment" Color="Red" Category="Misc">
+    <!-- Special node -->
+  </Node>
+
+  <Node Name="Signal" Color="Red" Category="Logic" Shape="ParameterGroupStyle">
+    <Signal Name="Out" Type="Out"  />
+  </Node>
+
+  <Node Name="Raise" Category="Logic">
+    <Member Name="Signal" Default="Name" Type="Signal" />
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out" Type="Out"  />
+  </Node>
+
+  <Node Name="Assert" Color="Blue" Category="Misc">
+    <Member Name="Message" Default=""/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out" Type="Out"  />
+  </Node>
+
+  <Node Name="Message" Category="Misc">
+    <Member Name="Message" Default=""/>
+    <Member Name="Delay" Default="5" Type="float"/>
+    <Member Name="Argument" Default="0" Type="int" />
+    <Signal Name="Print" Type="In" />
+    <Signal Name="Out"   Type="Out" />
+  </Node>
+
+  <Node Name="Sequence"  Category="Logic">
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out1" Type="Out"  />
+    <Signal Name="Out2" Type="Out"  />
+    <Signal Name="Out3" Type="Out"  />
+    <Signal Name="Out4" Type="Out"  />
+    <Signal Name="Out5" Type="Out"  />
+    <Signal Name="Out6" Type="Out"  />
+    <Signal Name="Out7" Type="Out"  />
+    <Signal Name="Out8" Type="Out"  />
+    <Signal Name="Out9" Type="Out"  />
+  </Node>
+
+  <Node Name="CycleInt32" Color="Purple" Category="Arithmetics">
+    <Member Name="Offset" Default="0" Type="int"/>
+    <Member Name="Current" Default="0" Type="int"/>
+    <Member Name="Maximum" Default="0" Type="int"/>
+    <Member Name="Value" Default="0" Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>  
+  
+  <Node Name="AddInt32" Color="Purple" Category="Arithmetics">
+    <Member Name="A" Default="0" Type="int"/>
+    <Member Name="B" Default="0" Type="int"/>
+    <Member Name="C" Default="0" Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="SubtractInt32" Color="Purple" Category="Arithmetics">
+    <Member Name="A" Default="0" Type="int"/>
+    <Member Name="B" Default="0" Type="int"/>
+    <Member Name="C" Default="0" Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="MultiplyInt32" Color="Purple" Category="Arithmetics">
+    <Member Name="A" Default="0" Type="int"/>
+    <Member Name="B" Default="0" Type="int"/>
+    <Member Name="C" Default="0" Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="DivideInt32" Color="Purple" Category="Arithmetics">
+    <Member Name="A" Default="0" Type="int"/>
+    <Member Name="B" Default="0" Type="int"/>
+    <Member Name="C" Default="0" Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="AddFloat" Color="Purple" Category="Arithmetics">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="B" Default="0" Type="float"/>
+    <Member Name="C" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="SubtractFloat" Color="Purple" Category="Arithmetics">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="B" Default="0" Type="float"/>
+    <Member Name="C" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="MultiplyFloat" Color="Purple" Category="Arithmetics">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="B" Default="0" Type="float"/>
+    <Member Name="C" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="DivideFloat" Color="Purple" Category="Arithmetics">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="B" Default="0" Type="float"/>
+    <Member Name="C" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="CompareBool" Color="Purple" Category="Comparison">
+    <Member Name="A" Default="0" Type="bool"/>
+    <Member Name="B" Default="0" Type="bool"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Failed"  Type="Out" />
+    <Signal Name="Succeeded" Type="Out" />
+  </Node>
+
+  <Node Name="CompareInt32" Color="Purple" Category="Comparison">
+    <Member Name="A" Default="0" Type="int"/>
+    <Member Name="B" Default="0" Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="A &lt;= B"  Type="Out" />
+    <Signal Name="A  &gt; B"  Type="Out" />
+    <Signal Name="A == B"  Type="Out" />
+    <Signal Name="A != B"  Type="Out" />
+    <Signal Name="A  &lt; B"  Type="Out" />
+    <Signal Name="A &gt;= B"  Type="Out" />
+  </Node>
+
+  <Node Name="CompareFloat" Color="Purple" Category="Comparison">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="B" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="A &lt;= B"  Type="Out" />
+    <Signal Name="A  &gt; B"  Type="Out" />
+    <Signal Name="A == B"  Type="Out" />
+    <Signal Name="A != B"  Type="Out" />
+    <Signal Name="A  &lt; B"  Type="Out" />
+    <Signal Name="A &gt;= B"  Type="Out" />
+  </Node>
+
+  <Node Name="CounterInt32" Color="Purple" Category="Comparison">
+    <Member Name="A" Default="0" Type="int"/>
+    <Member Name="B" Default="0" Type="int"/>
+    <Member Name="Amount" Default="0" Type="int"/>
+    <Member Name="Result" Default="0" Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="A &lt;= B"  Type="Out" />
+    <Signal Name="A  &gt; B"  Type="Out" />
+    <Signal Name="A == B"  Type="Out" />
+    <Signal Name="A  &lt; B"  Type="Out" />
+    <Signal Name="A &gt;= B"  Type="Out" />
+  </Node>
+
+  <Node Name="CounterFloat" Color="Purple" Category="Comparison">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="B" Default="0" Type="float"/>
+    <Member Name="Amount" Default="0" Type="float"/>
+    <Member Name="Result" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="A &lt;= B"  Type="Out" />
+    <Signal Name="A  &gt; B"  Type="Out" />
+    <Signal Name="A == B"  Type="Out" />
+    <Signal Name="A  &lt; B"  Type="Out" />
+    <Signal Name="A &gt;= B"  Type="Out" />
+  </Node>
+
+  <Node Name="ParameterString" Category="Parameter">
+    <Member Name="Value" Default=""/>
+  </Node>
+
+  <Node Name="ParameterInt32" Category="Parameter">
+    <Member Name="Value" Default="" Type="int" />
+  </Node>
+
+  <Node Name="RandomInt32" Category="Parameter">
+    <Member Name="Value" Default="" Type="int" />
+    <Member Name="Minimum" Default="" Type="int" />
+    <Member Name="Maximum" Default="" Type="int" />
+  </Node>
+
+  <Node Name="ParameterFloat" Category="Parameter">
+    <Member Name="Value" Default="" Type="float" />
+  </Node>
+
+  <Node Name="RandomFloat" Category="Parameter">
+    <Member Name="Value" Default="" Type="float" />
+    <Member Name="Minimum" Default="" Type="float" />
+    <Member Name="Maximum" Default="" Type="float" />
+  </Node>
+
+  <Node Name="Concatenate" Color="Purple" Category="String">
+    <Member Name="A" Default="" />
+    <Member Name="B" Default="" />
+    <Member Name="C" Default="" />
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="Delay" Color="Purple" Category="Misc">
+    <Member Name="Delay" Default="5" Type="float" />
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="Sin" Color="Purple" Category="Math">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="Result" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="Cos" Color="Purple" Category="Math">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="Result" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="Tan" Color="Purple" Category="Math">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="Result" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="ArcSin" Color="Purple" Category="Math">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="Result" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="ArcCos" Color="Purple" Category="Math">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="Result" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="ArcTan" Color="Purple" Category="Math">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="Result" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="SinHyperbolic" Color="Purple" Category="Math">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="Result" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="CosHyperbolic" Color="Purple" Category="Math">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="Result" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="TanHyperbolic" Color="Purple" Category="Math">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="Result" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="Max" Color="Purple" Category="Math">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="B" Default="0" Type="float"/>
+    <Member Name="Result" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="Min" Color="Purple" Category="Math">
+    <Member Name="A" Default="0" Type="float"/>
+    <Member Name="B" Default="0" Type="float"/>
+    <Member Name="Result" Default="0" Type="float"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="KeyPressed" Category="Events">
+    <Member Name="Key" Default="0" Type="TypeKeyPressed"/>
+    <Signal Name="Pressed"  Type="Out" />
+    <Signal Name="Released" Type="Out" />
+  </Node>
+
+  <Node Name="QueryMenuState" Category="UI">
+    <Member Name="Value" Default="" Type="int" />
+  </Node>
+
+  <Node Name="QueryMenuSubState" Category="UI">
+    <Member Name="Value" Default="" Type="int" />
+  </Node>
+
+  <Node Name="ChangeMenuState" Category="UI">
+    <Member Name="StateId" Default="0" Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="ChangeMenuSubState" Category="UI">
+    <Member Name="SubStateId" Default="0" Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out"  Type="Out" />
+  </Node>
+
+  <Node Name="UseWeapon" Category="Game">
+    <Signal Name="StartFire" Type="In" />
+    <Signal Name="EndFire" Type="In" />
+    <Signal Name="StartCharge" Type="In" />
+    <Signal Name="EndCharge" Type="In" />
+    <Signal Name="FireStarted"  Type="Out" />
+    <Signal Name="FireEnded"  Type="Out" />
+    <Signal Name="ChargeStarted"  Type="Out" />
+    <Signal Name="ChargeEnded"  Type="Out" />
+  </Node>
+
+  <Node Name="Spawn" Category="Unit">
+    <Member Name="SpawnClass" Default=""/>
+	  <Member Name="SpawnScale" Default="1 1 1" Type="vector3"/>
+	  <Member Name="SpawnOrientation" Default="0 0 0 1" Type="quaternion"/>
+	  <Member Name="SpawnPoint" Default="0 0 0" Type="vector3"/>
+	  <Signal Name="In" Type="In" />
+	  <Signal Name="Out" Type="Out" />
+    <Signal Name="Succeeded" Type="Out" />
+    <Signal Name="Failed" Type="Out" />
+  </Node>
+
+  <Node Name="ChangeHealth" Category="Unit">
+    <Member Name="Unit" Default="0" Type="int" />
+    <Member Name="Amount" Default="0" Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Failed"  Type="Out" />
+    <Signal Name="Succeeded" Type="Out" />
+  </Node>
+
+  <Node Name="QueryHealthOfUnit" Category="Unit">
+    <Member Name="Unit" Default="0"  Type="int"/>
+    <Member Name="Current" Default="0"  Type="int"/>
+    <Member Name="Maximum" Default="0"  Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Failed"  Type="Out" />
+    <Signal Name="Succeeded" Type="Out" />
+  </Node>  
+
+  <Node Name="GFXSetVariable" Color="LimeGreen" Category="GFx">
+    <Member Name="Movie" Default="0" Type="int"/>
+    <Member Name="Variable" Default="" />
+    <Member Name="Value" Default="0" Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out" Type="Out"  />
+  </Node>
+
+  <Node Name="GFXGetVariable" Color="LimeGreen" Category="GFx">
+    <Member Name="Movie" Default="0" Type="int"/>
+    <Member Name="Variable" Default="" />
+    <Member Name="Value" Default="0" Type="int"/>
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out" Type="Out"  />
+  </Node>
+
+  <Node Name="QueryLocationOfUnit" Color="LimeGreen" Category="Unit">
+    <Member Name="Unit" Default="0" Type="int"/>
+    <Member Name="Orientation" Default="0 0 0 1" Type="quaternion" />
+    <Member Name="Location" Default="0 0 0" Type="vector3" />
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out" Type="Out"  />
+  </Node>
+
+
+
+</Flow>

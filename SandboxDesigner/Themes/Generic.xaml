@@ -1,0 +1,386 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Aurora.SandboxDesigner"
+    xmlns:s="clr-namespace:Aurora.SandboxDesigner.Controls">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source=";component/Themes/GraphDesigner.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+
+    
+
+    <DataTemplate x:Key="ParameterConnectors">
+        <DataTemplate.Resources>
+            <s:GraphNodeParameterTemplateSelector x:Key="GraphNodeParameterTemplateSelector"
+                x:Name="GraphNodeParameterTemplateSelector" />
+        </DataTemplate.Resources>
+        <Grid>           
+            <ContentPresenter Content="{Binding .}"  HorizontalAlignment="Stretch" 
+                ContentTemplateSelector="{StaticResource GraphNodeParameterTemplateSelector}" />
+            <s:Connector x:Name="Part_Source" Normal="-30,0" Group="Sink"
+                VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-10,1,10,-1" />
+            <s:Connector x:Name="Part_Out"  Normal="30,0" Group="Source"
+                VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,1,-10,-1" />
+        </Grid>
+    </DataTemplate>
+    <Style x:Key="ParameterConnectorsHost" BasedOn="{StaticResource CommonConnectorsHost}">
+        <Style.Resources>
+            <s:GraphNodeParameterTemplateSelector x:Key="GraphNodeParameterTemplateSelector"
+                x:Name="GraphNodeParameterTemplateSelector" />
+        </Style.Resources>
+        <Setter Property="ItemsControl.ItemTemplate" Value="{StaticResource ParameterConnectors}" />
+        
+        
+        
+        <!-- <Setter Property="ItemsControl.ItemTemplate" Value="{x:Null}" /> -->
+        <!-- <Setter Property="ItemsControl.ItemTemplateSelector" Value="{StaticResource GraphNodeParameterTemplateSelector}" />       -->
+    </Style>
+
+    <DataTemplate DataType="{x:Type s:GraphNodeItem}">
+        <StackPanel Margin="2">
+            <TextBlock Text="{Binding Typename}" Margin="0,0,0,0" Padding="0,0,0,0" />
+            <Separator  Padding="0,0,0,0" Margin="0,0,0,0" />
+            <Grid Margin="10,0,10,0">
+                <Grid.RowDefinitions >
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ItemsControl Name="Part_Parameters" Grid.Row="0" Grid.ColumnSpan="2"  Grid.Column="0" ItemsSource="{Binding Properties}" Style="{StaticResource ParameterConnectorsHost}" />
+                <ItemsControl Name="Part_Inputs"  Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Inputs}" Style="{StaticResource InputConnectorsHost}" />
+                <ItemsControl Name="Part_Outputs" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Outputs}" Style="{StaticResource OutputConnectorsHost}" />
+            </Grid>
+            <s:EditableTextBlock Text="{Binding Name, Mode=TwoWay}" Style="{StaticResource EditableTextBlockStyle}" />
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type s:GraphProperty}">
+        <!--
+        <s:EditableTextBlock Text="{Binding Value, Mode=TwoWay}" HorizontalAlignment="Stretch" 
+                    Style="{StaticResource EditableTextBlockStyle}"   />
+        -->
+        <s:TextField Text="{Binding Value, Mode=TwoWay}" Tag="{Binding Name, Mode=TwoWay}" />
+    </DataTemplate>
+
+    
+    
+
+    <Style TargetType="{x:Type s:TextField}">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:TextField}">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <TextBlock Background="{TemplateBinding Background}" x:Name="Part_Content" TextTrimming="CharacterEllipsis"
+                                    Width="130">
+                            <TextBlock.Text>
+                               <MultiBinding StringFormat="{}{0}={1}">
+                                    <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    <Binding Path="Text" RelativeSource="{RelativeSource TemplatedParent}" />
+                                </MultiBinding>                                                                                   
+                            </TextBlock.Text>
+                        </TextBlock>
+
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Part_Content"  Property="Text" Value="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Setter Property="Background" Value="sc# 0.1,0.0,0.0,0.0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type s:TextField}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" FocusManager.IsFocusScope="True">
+                                <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" 
+                                         MinWidth="130"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    <Style TargetType="{x:Type s:Vector4}">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:Vector4}">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <!--<TextBlock Background="{TemplateBinding Background}" x:Name="Part_Content" Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />-->
+                        <TextBlock Background="{TemplateBinding Background}" x:Name="Part_Content" TextTrimming="CharacterEllipsis"
+                                    Width="130">
+                            <TextBlock.Text>
+                               <MultiBinding StringFormat="{}{0}={1}">
+                                    <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    <Binding Path="Text" RelativeSource="{RelativeSource TemplatedParent}" />
+                                </MultiBinding>                                                                                   
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Part_Content"  Property="Text" Value="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Setter Property="Background" Value="sc# 0.1,0.0,0.0,0.0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type s:Vector4}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <StackPanel Background="{TemplateBinding Background}" FocusManager.IsFocusScope="True">
+                                    <TextBox Text="{Binding ComponentX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <TextBox Text="{Binding ComponentY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <TextBox Text="{Binding ComponentZ, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <TextBox Text="{Binding ComponentW, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                </StackPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type s:Vector3}">          
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:Vector3}">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <!--<TextBlock Background="{TemplateBinding Background}" x:Name="Part_Content" Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />-->
+                        
+                        <TextBlock Background="{TemplateBinding Background}" x:Name="Part_Content" TextTrimming="CharacterEllipsis"
+                                    Width="130">
+                            <TextBlock.Text>
+                               <MultiBinding StringFormat="{}{0}={1}">
+                                    <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    <Binding Path="Text" RelativeSource="{RelativeSource TemplatedParent}" />
+                                </MultiBinding>                                                                                   
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Part_Content"  Property="Text" Value="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Setter Property="Background" Value="sc# 0.1,0.0,0.0,0.0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type s:Vector3}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <StackPanel Background="{TemplateBinding Background}" FocusManager.IsFocusScope="True">
+                                    <TextBox Text="{Binding ComponentX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <TextBox Text="{Binding ComponentY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <TextBox Text="{Binding ComponentZ, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                </StackPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type s:Vector2}">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:Vector2}">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <!--<TextBlock Background="{TemplateBinding Background}" x:Name="Part_Content" Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" />-->
+                        <TextBlock Background="{TemplateBinding Background}" x:Name="Part_Content" TextTrimming="CharacterEllipsis" Width="130">
+                            <TextBlock.Text>
+                               <MultiBinding StringFormat="{}{0}={1}">
+                                    <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    <Binding Path="Text" RelativeSource="{RelativeSource TemplatedParent}" />
+                                </MultiBinding>                                                                                   
+                            </TextBlock.Text>
+                        </TextBlock>                        
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Part_Content"  Property="Text" Value="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Setter Property="Background" Value="sc# 0.1,0.0,0.0,0.0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type s:Vector2}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <StackPanel Background="{TemplateBinding Background}" FocusManager.IsFocusScope="True">
+                                    <TextBox Text="{Binding ComponentX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <TextBox Text="{Binding ComponentY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                </StackPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    <Style TargetType="{x:Type s:Vector1}">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:Vector1}">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <TextBlock Background="{TemplateBinding Background}" x:Name="Part_Content" TextTrimming="CharacterEllipsis"
+                                    Width="130">
+                            <TextBlock.Text>
+                               <MultiBinding StringFormat="{}{0}={1}">
+                                    <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    <Binding Path="Text" RelativeSource="{RelativeSource TemplatedParent}" />
+                                </MultiBinding>                                                                                   
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Part_Content"  Property="Text" Value="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Setter Property="Background" Value="sc# 0.1,0.0,0.0,0.0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type s:Vector1}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <StackPanel Background="{TemplateBinding Background}" FocusManager.IsFocusScope="True">
+                                    <TextBox Text="{Binding ComponentX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                </StackPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    <Style TargetType="{x:Type s:EnumField}">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:EnumField}">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <!--<TextBlock Background="{TemplateBinding Background}" x:Name="Part_Content" Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" /> -->
+
+                        <TextBlock Background="{TemplateBinding Background}" x:Name="Part_Content" TextTrimming="CharacterEllipsis" Width="130">
+                            <TextBlock.Text>
+                               <MultiBinding StringFormat="{}{0}={1}">
+                                    <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    <Binding Path="Text" RelativeSource="{RelativeSource TemplatedParent}" />
+                                </MultiBinding>                                                                                   
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Part_Content"  Property="Text" Value="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Setter Property="Background" Value="sc# 0.1,0.0,0.0,0.0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type s:EnumField}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <StackPanel Background="{TemplateBinding Background}" FocusManager.IsFocusScope="True">
+                                    <ComboBox DisplayMemberPath="Key"  Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                              
+                                              ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                </StackPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>    
+    
+    <Style TargetType="{x:Type s:BooleanField}">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:BooleanField}">
+                    <ControlTemplate.Resources>
+                        <s:BooleanFieldDisplayConverter x:Key="BooleanFieldDisplayConverter" />                       
+                    </ControlTemplate.Resources>
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <TextBlock Background="{TemplateBinding Background}" x:Name="Part_Content" >
+                            <TextBlock.Text>
+                               <MultiBinding StringFormat="{}{0}={1}">
+                                    <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    <Binding Path="Text" RelativeSource="{RelativeSource TemplatedParent}" Converter="{StaticResource BooleanFieldDisplayConverter}" />
+                                </MultiBinding>                                                                                   
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Part_Content"  Property="Text" Value="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Setter Property="Background" Value="sc# 0.1,0.0,0.0,0.0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type s:BooleanField}">
+                            <ControlTemplate.Resources>
+                                <s:BooleanFieldValueConverter x:Key="BooleanFieldValueConverter" />
+                            </ControlTemplate.Resources>
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <StackPanel Background="{TemplateBinding Background}" FocusManager.IsFocusScope="True">
+                                    <CheckBox IsChecked="{Binding Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanFieldValueConverter}}" />
+                                </StackPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    
+    
+    
+</ResourceDictionary>

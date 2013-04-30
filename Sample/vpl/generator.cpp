@@ -1,0 +1,1480 @@
+/**
+ * Domain Specific Visual Programming Language
+ * Copyright (c) 2013 NHTV UNIVERSITY OF APPLIED SCIENCES
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holders nor the names of its
+ *    contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author: Lawrence Kok
+ *
+ */
+
+#include <stdio.h>
+#include <malloc.h>
+#include <windows.h>
+#include <string>
+#include <map>
+#include "tinyxml.h"
+#include "weak.h"
+#include "Generated.h"
+
+const int prologue_jump = /*13*/ 23 + 16;
+const int prologue_size = /*18*/ prologue_jump + 5;
+const int method_base   = 4 + 4 + 4 + 4;
+const int method_table  = method_base + 5 + 5 + 5;
+const int method_exec   = method_base;
+const int method_pexec  = method_base + 5;
+const int method_pexec2  = method_base + 5 + 5;
+
+typedef void (__cdecl *method_releasetokensig)(void* a, unsigned int token);
+
+struct FlowHeader
+{
+	void* head;
+	void* tail;
+};
+
+
+template<typename T> T& method_getproperty(void* a, int offset)
+{
+	extern void* method_getpropertyaddr(void* a, int offset);
+	return *static_cast<T*>(method_getpropertyaddr(a, offset));
+}
+
+template<typename T> T& method_setproperty(void* a, int offset)
+{
+	extern void* method_setpropertyaddr(void* a, int offset);
+	return *static_cast<T*>(method_setpropertyaddr(a, offset));
+}
+
+void* method_getpropertyaddr(void* a, int offset)
+{
+	char* s = reinterpret_cast<char*>(a) - 8 - offset * 8;
+	int* r = (int*)s;
+	return s + *r;	
+}
+
+void* method_setpropertyaddr(void* a, int offset)
+{
+	char* s = reinterpret_cast<char*>(a) - 4 - offset * 8;
+	int* r = (int*)s;
+	return s + *r;	
+}
+
+char* method_getnodename(void* a)
+{
+	char* s = reinterpret_cast<char*>(a) + 4 + 4;
+	if( *reinterpret_cast<int*>(s)  == 0 ) 
+		return 0;
+	else
+		return (char*)(reinterpret_cast<char*>(s)  + *reinterpret_cast<int*>(s));
+}
+
+int  method_getnodekind(void* a)
+{
+	char* s = reinterpret_cast<char*>(a) + 4;
+	return *(int*)s;
+}
+
+void method_signal(void* a, int signal)
+{
+	char* executeFunction = (char*)a + method_exec;
+
+	__asm
+	{
+		push signal;
+		push a;		
+		call method_pexec;
+		call executeFunction;	
+		add  esp, 8;
+	}	
+}
+
+void method_raise(void* a, int offset)
+{
+	int r = method_table + prologue_size * 2 * offset;
+
+	__asm 
+	{	
+		push eax
+		mov  eax, a;
+		add  eax, r;
+		add  eax, prologue_size;
+		push 6;
+		push a;		
+		call eax;
+		add  esp, 8;
+
+		mov  eax, a;
+		add  eax, r;
+		push 6;
+		push a;		
+		call eax;
+		add  esp, 8;
+		pop  eax;
+	}
+}
+
+
+
+
+void* method_getfirst(void* a)
+{
+	if( *reinterpret_cast<int*>(a)  == 0 ) 
+		return 0;
+	else
+		return reinterpret_cast<char*>(a)  + *reinterpret_cast<int*>(a) ;
+}
+
+void* method_next(void* a)
+{
+	/*
+	if( reinterpret_cast<char*>(a) + *reinterpret_cast<int*>(a) == a )
+		return 0;
+	*/
+	return reinterpret_cast<char*>(a) + *reinterpret_cast<int*>(a);
+}
+
+
+
+void* method_getbyname(void* a, const char* name)
+{
+	void* node = 0, *f = method_getfirst(a), *n = f;
+	if( f != 0 ) do {
+		char* member = method_getnodename(f);		
+		if( member != 0 && stricmp(member, name) == 0 ) node = f;
+	} while( n != (f = method_next(f)) );
+	return node;
+}
+
+
+
+
+void* method_get_global(void* a)
+{
+	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
+	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
+	baseImage += 12;
+	return *reinterpret_cast<void**>(baseImage);
+}
+
+void  method_set_global(void* a, void* addr)
+{
+	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
+	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
+	baseImage += 12;
+	*reinterpret_cast<void**>(baseImage) = addr;
+}
+
+unsigned int method_num_active_tokens(void* a)
+{
+	char* baseImage = (char*)a;
+	baseImage = baseImage + 8;
+	aurora::WeakReferenceManager<12, 15>& weakreferenceManager = *(aurora::WeakReferenceManager<12, 15>*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));	
+	return weakreferenceManager.Count();
+}
+
+unsigned int method_createtoken(void* a, void* ptr)
+{
+	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
+	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
+	void* ptr_diff = (void*)(static_cast<char*>(ptr) - static_cast<char*>(baseImage));
+	baseImage = baseImage + 4;
+	unsigned int* referenceCounter = (unsigned int*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
+	baseImage = baseImage + 4;
+	aurora::WeakReferenceManager<12, 15>& weakreferenceManager = *(aurora::WeakReferenceManager<12, 15>*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
+	aurora::WeakReferenceHandle<12,15> h = weakreferenceManager.Add(ptr_diff, 1);				
+	unsigned int weakRefAsValue = h;
+	referenceCounter[h.m_index] = 1;
+	return weakRefAsValue;
+}
+
+
+
+
+
+
+
+void  method_reftoken_inc(void* a, unsigned int token)
+{
+	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
+	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage)) + 4;
+	
+	unsigned int* referenceCounter = (unsigned int*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
+	baseImage = baseImage + 4;
+	aurora::WeakReferenceManager<12, 15>& weakreferenceManager = *(aurora::WeakReferenceManager<12, 15>*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
+
+	aurora::WeakReferenceHandle<12, 15>& s = *(aurora::WeakReferenceHandle<12, 15>*)&token;	
+	referenceCounter[s.m_index]++;
+}
+
+void  method_reftoken_dec(void* a, unsigned int token, method_releasetokensig sig)
+{
+	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
+	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage)) + 4;
+
+	unsigned int* referenceCounter = (unsigned int*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
+	baseImage = baseImage + 4;
+	aurora::WeakReferenceManager<12, 15>& weakreferenceManager = *(aurora::WeakReferenceManager<12, 15>*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
+
+	aurora::WeakReferenceHandle<12, 15>& s = *(aurora::WeakReferenceHandle<12, 15>*)&token;	
+	if( --referenceCounter[s.m_index] == 0) {				
+		//sig(a, token);
+		//weakreferenceManager.Remove(s);	
+	}
+}
+
+void method_compare_and_set_token(void* a, unsigned int index, unsigned int token, method_releasetokensig sig)
+{
+	//Cache the tokens
+	int parentToken = *static_cast<unsigned int*>(method_getpropertyaddr(a, index));
+	int selfToken   = *static_cast<unsigned int*>(method_setpropertyaddr(a, index));
+	
+	//Increment the token I own.
+	//method_reftoken_inc(a, selfToken);	
+
+	//Increment the token of my parent.
+	method_reftoken_inc(a, parentToken);	
+	
+	//Swawp the tokens
+	*static_cast<unsigned int*>(method_setpropertyaddr(a, index)) = token;	
+	
+	//Decrement previous owned token
+	//method_reftoken_dec(a, selfToken, &method_releasetoken);					
+
+	//Decrement the token I used to own		
+	method_reftoken_dec(a, selfToken, sig);
+	
+	//Decrement the token I used to own			
+	method_reftoken_dec(a, parentToken, sig);	
+}
+
+void method_compare_and_swap_token(void* a, unsigned int index, method_releasetokensig sig)
+{
+	unsigned int d  = *static_cast<unsigned int*>(method_getpropertyaddr(a, index));
+	unsigned int c  = *static_cast<unsigned int*>(method_setpropertyaddr(a, index));	
+	if( d != c )
+	{		
+		method_reftoken_inc( a, d );
+		*static_cast<unsigned int*>(method_setpropertyaddr(a, index)) = d;
+		method_reftoken_dec( a, c, sig);
+	}
+}
+
+
+void* method_gettoken(void* a, unsigned int token)
+{
+	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
+	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
+	baseImage = baseImage + 8;
+	aurora::WeakReferenceManager<12, 15>& weakreferenceManager = *(aurora::WeakReferenceManager<12, 15>*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
+	baseImage = baseImage - 8;
+
+	aurora::WeakReferenceHandle<12, 15>& s = *(aurora::WeakReferenceHandle<12, 15>*)&token;	
+	return baseImage + (unsigned int)weakreferenceManager.Get(s);		
+}
+
+int  method_gettokentype(void* a, unsigned int token)
+{	
+	aurora::WeakReferenceHandle<12, 15>& s = *(aurora::WeakReferenceHandle<12, 15>*)&token;	
+	return s.m_type;
+}
+
+
+
+
+
+void* emitCharLiteral( bool preview, void* memory, const char* v)
+{
+	char* real = static_cast<char*>( memory );
+	if( !preview )
+	{
+		strcpy(real, v);
+		real[strlen(v)] = 0;
+	}
+	
+	return real + strlen(v) + 1;
+}
+
+void* emitRelative( bool preview, void* memory, void* memoryAdress)
+{
+	char* real = static_cast<char*>( memory );
+	if( !preview )
+	{		
+		int   diff = static_cast<char*>( memoryAdress ) - static_cast<char*>( memory );
+		char* v = reinterpret_cast<char*>( &diff );	
+		real[0] = v[0];
+		real[1] = v[1];
+		real[2] = v[2];
+		real[3] = v[3];
+	}
+
+	return real + 4;
+}
+
+void* emitInt32( bool preview, void* memory, int value )
+{
+	char* real = static_cast<char*>( memory );
+	if( !preview )
+	{		
+		char*    v = reinterpret_cast<char*>( &value );
+		real[0] = v[0];
+		real[1] = v[1];
+		real[2] = v[2];
+		real[3] = v[3];
+	}
+	return real + 4;
+}
+
+void* emitFloat( bool preview, void* memory, float value )
+{
+	char* real = static_cast<char*>( memory );
+	if( !preview )
+	{
+		char*    v = reinterpret_cast<char*>( &value );
+		real[0] = v[0];
+		real[1] = v[1];
+		real[2] = v[2];
+		real[3] = v[3];
+	}
+
+	return real + 4;
+}
+
+void* emitCall(bool preview, void* memory, void* memoryAdress)
+{
+	char* real = static_cast<char*>( memory );
+	if( !preview )
+	{
+		int   diff = static_cast<char*>( memoryAdress ) - static_cast<char*>( memory ) - 5;
+		char* v = reinterpret_cast<char*>( &diff );	
+		real[0] = 0xE8;
+		real[1] = v[0];
+		real[2] = v[1];
+		real[3] = v[2];
+		real[4] = v[3];
+	}
+	
+	return real + 5;
+}
+
+void* emitRet(bool preview, void* memory)
+{
+	char* real = static_cast<char*>( memory );
+	if( !preview )
+	{
+		real[0] = 0xC3;
+	}
+
+	return real + 1;
+}
+
+
+void* emitJump(bool preview, void* memory, void* memoryAdress)
+{
+	char* real = static_cast<char*>( memory );
+	if( !preview )
+	{
+		int   diff = static_cast<char*>( memoryAdress ) - static_cast<char*>( memory ) - 5;
+		char* v = reinterpret_cast<char*>( &diff );	
+		real[0] = 0xE9;
+		real[1] = v[0];
+		real[2] = v[1];
+		real[3] = v[2];
+		real[4] = v[3];
+	}
+
+	return real + 5;
+}
+
+void* emitPushEAX(bool preview, void* memory)
+{
+	char* real = static_cast<char*>( memory );
+	if( !preview )
+	{
+		real[0] = 0x50;
+	}
+
+	return real + 1;
+}
+
+
+void* emitPush8(bool preview,void* memory, int value)
+{
+	char* real = static_cast<char*>( memory );
+	if( !preview )
+	{
+		char*    v = reinterpret_cast<char*>( &value );
+		real[0] = 0x6A;
+		real[1] = v[0];
+	}
+	return real + 2;
+}
+
+void* emitAddEsp8(bool preview,void* memory, int value)
+{
+	char* real = static_cast<char*>( memory );
+	if( !preview )
+	{
+		char*    v = reinterpret_cast<char*>( &value );
+		real[0] = 0x83;
+		real[1] = 0xC4;
+		real[2] = v[0];
+	}
+	return real + 3;
+}
+
+void* emitGetRelativeAdress(bool preview,void* memory, void* memoryAdress)
+{
+	char* real = static_cast<char*>( memory );
+	if( !preview )
+	{
+		int   diff = static_cast<char*>( memoryAdress ) - static_cast<char*>( &real[11] );
+		char* v = reinterpret_cast<char*>( &diff );	
+		real[0] = 0xEB;
+		real[1] = 0x04;
+		real[2] = 0x8B;
+		real[3] = 0x04;
+		real[4] = 0x24;
+		real[5] = 0xC3;	
+		emitCall(preview, real + 6, real + 2 );			
+		real[11] = 0x05;	
+		real[12] = v[0];	
+		real[13] = v[1];	
+		real[14] = v[2];	
+		real[15] = v[3];	
+		//real[16] = 0xC3;
+	}
+	return real + 16;
+}
+
+
+void* emitPrologue(bool preview,void* memory, void* memoryAdress, int source)
+{
+	char* real = static_cast<char*>( memory );
+	if( !preview )
+	{
+		char* v = reinterpret_cast<char*>( &memoryAdress );
+		char* s = reinterpret_cast<char*>( &source );
+
+
+		real = (char*)emitGetRelativeAdress(preview, real, memoryAdress);
+
+
+		
+		//int   diff = static_cast<char*>( memoryAdress ) - static_cast<char*>( memory ) - 5;
+		//char* v = reinterpret_cast<char*>( &diff );	
+		real[0] = 0x83;
+		real[1] = 0xC4;
+		real[2] = 0x04;
+
+		/*
+		real[3] = 0xC7;
+		real[4] = 0x04;
+		real[5] = 0x24;
+		real[6] = v[0];
+		real[7] = v[1];
+		real[8] = v[2];
+		real[9] = v[3];
+		*/
+
+		real[3] = 0x89;
+		real[4] = 0x04;
+		real[5] = 0x24;
+		real[6] = 0x90;
+		real[7] = 0x90;
+		real[8] = 0x90;
+		real[9] = 0x90;
+
+		  
+
+		real[10] = 0x83;
+		real[11] = 0xC4;
+		real[12] = 0x04;
+
+		real[13] = 0xC7;
+		real[14] = 0x04;
+		real[15] = 0x24;
+		real[16] = s[0];
+		real[17] = s[1];
+		real[18] = s[2];
+		real[19] = s[3];
+
+		real[20] = 0x83;
+		real[21] = 0xEC;
+		real[22] = 0x08;
+
+		/*
+		real[10] = 0x83;
+		real[11] = 0xEC;
+		real[12] = 0x04;
+		*/
+	}
+
+	return real + 23;
+}
+
+
+
+void* emitNodePrologue(bool preview,void* sequence, void* a, TiXmlElement* instanceInfo, TiXmlElement* typeInfo)
+{	
+	void* methodBody = sequence;
+	TiXmlElement* document = instanceInfo->Parent()->ToElement();
+	TiXmlElement* node = document->FirstChildElement();
+	for( ; node != 0; node = node->NextSiblingElement()) {
+		if( stricmp(node->Value(), "Connection") == 0x0 ) {							
+			char sourceEvent[1024]; char targetEvent[1024]; int targetSlot = -1, sourceSlot = -1;
+			unsigned int source, target, elementId; 
+			sscanf(node->Attribute("Source"), "%x.%s", &source, &sourceEvent);
+			sscanf(node->Attribute("Target"), "%x.%s", &target, &targetEvent);
+			sscanf(instanceInfo->Attribute("Id"), "%x", &elementId);
+			if( elementId == source || elementId == target ) {
+				if( stricmp(node->Attribute("Type"), "Property") == 0x0 ) 
+				{					
+					if( source == elementId ) 
+					{												
+						TiXmlElement* xnode = document->FirstChildElement();
+						for( ; xnode != 0; xnode = xnode->NextSiblingElement()) {
+							if( stricmp(xnode->Value(), "Node") == 0x0 ) {							
+								unsigned deserializedId;
+								sscanf(xnode->Attribute("Id"), "%x", &deserializedId);
+								if( deserializedId == target ) {	
+									sequence = emitGetRelativeAdress(preview, sequence, xnode->GetUserData());
+									sequence = emitPush8(preview, sequence, 6);	
+									sequence = emitPushEAX(preview, sequence);
+									sequence = emitCall(preview, sequence, (char*)xnode->GetUserData() + method_pexec2 );
+									sequence = emitAddEsp8(preview, sequence, 8);
+								}
+							}
+						}
+					}
+				}
+			}							
+		}
+	}
+
+	sequence = emitRet(preview, sequence);
+	emitJump(preview, (char*)a + method_pexec, methodBody );
+	return sequence;
+}
+
+
+
+
+
+void emitPreNodeData(TiXmlElement* instanceInfo, TiXmlElement* typeInfo, unsigned int& tokenCount, std::map<std::string, void*>& stringInterning  )
+{
+	tokenCount = 0;
+	TiXmlElement* node = typeInfo->FirstChildElement();
+	for( ; node != 0; node = node->NextSiblingElement()) {
+		if( stricmp(node->Value(), "Member") == 0x0 /*&& stricmp(node->Attribute("Name"), "Out")*/ ) {							
+			if( node->Attribute("Type") == 0x0 ) {	
+				const char* v = instanceInfo->Attribute(node->Attribute("Name"));	
+				stringInterning[std::string(v ? v : "")] = 0;
+				tokenCount++;
+			} 			
+		}
+	}
+}
+
+void* emitNodeData(bool preview, void* sequence, void* a, TiXmlElement* instanceInfo, TiXmlElement* typeInfo, void* base, unsigned int* referenceCounter, aurora::WeakReferenceManager<12, 15>& weakreferenceManager, std::map<std::string, void*>& stringInterning, std::map<unsigned int, TiXmlElement*>& node_mappings, std::map<unsigned int, TiXmlElement*>& node_mappings2 )
+{
+	//Emit the data-member patch table..
+	TiXmlElement* node = typeInfo->FirstChildElement();
+	for( ; node != 0; node = node->NextSiblingElement()) {
+		if( stricmp(node->Value(), "Member") == 0x0 /*&& stricmp(node->Attribute("Name"), "Out")*/ ) {							
+			if( node->Attribute("Type") == 0x0 ) {
+				
+				const char* v = instanceInfo->Attribute(node->Attribute("Name"));								
+				void* seq = stringInterning[std::string(v ? v : "")];
+				assert(seq);
+
+				void* ptr_diff = (void*)(static_cast<char*>(seq) - static_cast<char*>(base));
+				aurora::WeakReferenceHandle<12,15> h = weakreferenceManager.Add(ptr_diff, 0);				
+				referenceCounter[h.m_index] = 1;		
+				//sequence = emitCharLiteral(sequence, v ? v : "");				
+
+				
+				node->SetUserData(sequence);
+				unsigned int weakRefAsValue = h;
+				sequence = emitInt32(preview, sequence, weakRefAsValue);
+
+			} else if( stricmp(node->Attribute("Type"), "vector3") == 0x0 ) {
+				node->SetUserData(sequence);				
+				const char* v = instanceInfo->Attribute(node->Attribute("Name"));				
+				float x, y, z; int d = sscanf( v, "%f %f %f", &x, &y, &z);
+				sequence = emitFloat(preview, sequence, x);
+				sequence = emitFloat(preview, sequence, y);
+				sequence = emitFloat(preview, sequence, z);
+			} else if( stricmp(node->Attribute("Type"), "quaternion") == 0x0 ) {
+				node->SetUserData(sequence);				
+				const char* v = instanceInfo->Attribute(node->Attribute("Name"));				
+				float x, y, z, w; int d = sscanf( v, "%f %f %f %s", &x, &y, &z, &w);
+				sequence = emitFloat(preview, sequence, x);
+				sequence = emitFloat(preview, sequence, y);
+				sequence = emitFloat(preview, sequence, z);
+				sequence = emitFloat(preview, sequence, w);
+			} else if( stricmp(node->Attribute("Type"), "float") == 0x0 ) {
+				node->SetUserData(sequence);
+				const char* v = instanceInfo->Attribute(node->Attribute("Name"));
+				sequence = emitFloat(preview, sequence, atof(v ? v : "0"));
+			} else if( stricmp(node->Attribute("Type"), "int") == 0x0 ) {
+				node->SetUserData(sequence);
+				const char* v = instanceInfo->Attribute(node->Attribute("Name"));
+				sequence = emitInt32(preview, sequence, atoi(v ? v : "0"));
+			} else if( stricmp(node->Attribute("Type"), "bool") == 0x0 ) {
+				node->SetUserData(sequence);
+				const char* v = instanceInfo->Attribute(node->Attribute("Name"));
+				sequence = emitInt32(preview, sequence, atoi(v ? v : "0"));
+			} else if( stricmp(node->Attribute("Type"), "signal") == 0x0 ) {
+				node->SetUserData(sequence);
+				const char* name = instanceInfo->Attribute(node->Attribute("Name"));
+				void* node = 0, *f = a, *n = f;
+				do {
+					char* member = method_getnodename(f);		
+					if( member != 0 && stricmp(member, name) == 0 ) node = f;
+				} while( n != (f = method_next(f)) );
+				if( node != 0 ) 
+				{
+					sequence = emitRelative(preview, sequence, node);
+				} 
+				else 
+				{														
+					//Deserialize the unique identifier for the node.
+					unsigned int uniquenodeid; 
+					sscanf(name, "%x", &uniquenodeid);
+					std::map<unsigned int, TiXmlElement*>::iterator itt = node_mappings2.find(uniquenodeid);
+					if( itt == node_mappings2.end() ) 
+					{
+						printf("Signal missing %s on node (%s:%s)\r\n", name, instanceInfo->Attribute("Id"), instanceInfo->Attribute("Name"));
+						sequence = emitRelative(preview, sequence, sequence);
+					}
+					else 
+					{						
+						node = itt->second->GetUserData();
+						sequence = emitRelative(preview, sequence, node);
+					}
+				}		
+			} else {
+				//Emit the data-member patch table..
+				const char* v = instanceInfo->Attribute(node->Attribute("Name"));				
+				TiXmlElement* xnode = typeInfo->Parent()->FirstChildElement();
+				for( ; xnode != 0; xnode = xnode->NextSiblingElement()) {
+					if( stricmp( xnode->Value(), "Enum" ) == 0x0 && stricmp(xnode->Attribute("Name"),node->Attribute("Type")) == 0x0 ) {
+						TiXmlElement* enode = xnode->FirstChildElement();
+						for( ; enode != 0; enode = enode->NextSiblingElement()) {				
+							if( strcmp(enode->Attribute("Name"), v) == 0x0 ) 
+							{
+								unsigned int value;
+								if( sscanf(enode->Attribute("Value"), "0x%X", &value) == 0 )
+								{
+									node->SetUserData(sequence);								
+									sequence = emitInt32(preview, sequence, atoi(enode->Attribute("Value")));
+								}
+								else
+								{
+									node->SetUserData(sequence);								
+									sequence = emitInt32(preview, sequence, value);
+								}								
+							}
+						}
+					}
+				}
+
+				
+			}
+		}
+	}
+
+	node = typeInfo->FirstChildElement();	
+	for( int i = 0; node != 0; node = node->NextSiblingElement(), i++) {
+		if( stricmp(node->Value(), "Member") == 0x0 ) {											
+			void* usr = node->GetUserData();
+			node->SetUserData(0);			
+			emitRelative(preview, reinterpret_cast<char*>(a) - 8 - i * 8, usr);
+			emitRelative(preview, reinterpret_cast<char*>(a) - 4 - i * 8, usr);
+		}
+	}	
+
+	return sequence;
+}
+
+void* emitNode( bool preview, int nodeKind, void* memory, FlowHeader* header, void*& out, TiXmlElement* instanceInfo, TiXmlElement* typeInfo, void* base  )
+{
+	//Emit rdata
+	void* uniqueName, *sequence = memory, *sequenceu;
+	bool hasUniqueName = stricmp(instanceInfo->Attribute("Id"), instanceInfo->Attribute("Designer.Name")) != 0x0;
+	if( hasUniqueName ) uniqueName = sequence, sequence = emitCharLiteral(preview, sequence, instanceInfo->Attribute("Designer.Name"));
+	
+	TiXmlElement* node = 0;
+	node = typeInfo->LastChild()->ToElement();
+	for( ; node != 0; node = node->PreviousSibling() == 0 ? 0 : node->PreviousSibling()->ToElement()) {
+		if( stricmp(node->Value(), "Member") == 0x0 ) {											
+			void* usr = node->GetUserData();
+			node->SetUserData(0);
+			sequence = emitRelative(preview, sequence, sequence);
+			sequence = emitRelative(preview, sequence, sequence);
+		}
+	}
+
+		
+	//Emit l-table  data.
+	if( header->tail != 0x0 )
+	emitRelative( preview, header->tail, sequence);
+	if( header->head == 0x0 )
+	header->head = sequence;
+	header->tail = sequence;
+
+	out = sequence;
+	sequence = emitRelative(preview, sequence, header->head);
+	sequence = emitInt32(preview, sequence, nodeKind );
+	sequence = hasUniqueName ? emitRelative(preview, sequence, uniqueName) : emitRelative(preview, sequence, sequence);
+	sequence = emitRelative(preview, sequence, base);
+	
+	
+	//Reserve space to hot-patch the dynamicly linked implementation method..
+	sequenceu = sequence;
+	sequence  = emitJump(preview, sequence, sequence);
+	emitRet(preview, sequenceu);
+
+	//Reserve space for the pre-execution function
+	sequenceu = sequence;
+	sequence  = emitJump(preview, sequence, sequence );
+	emitRet(preview, sequenceu);
+
+	//Reserve space for the pre-execution function
+	sequenceu = sequence;
+	sequence  = emitJump(preview, sequence, sequence );
+	emitRet(preview, sequenceu);
+
+	//Emit the output signals patch table..
+	node = typeInfo->FirstChildElement();
+	for( ; node != 0; node = node->NextSiblingElement()) {
+		if( stricmp(node->Value(), "Signal") == 0x0 && stricmp(node->Attribute("Type"), "Out") == 0x0 ) 
+		{							
+			//Reserve space to hot-patch the sequence of bytes..
+			sequenceu = sequence;
+			sequence  = emitPrologue(preview, sequence, 0, -1);												
+			sequence  = emitJump(preview, sequence, sequence);		
+			emitRet(preview, sequenceu);
+
+			//Reserve space to hot-patch the sequence of bytes..
+			sequenceu = sequence;
+			sequence  = emitPrologue(preview, sequence, 0, -1);												
+			sequence  = emitJump(preview, sequence, &sequence);	
+			emitRet(preview, sequenceu);
+		}
+	}	
+
+	
+	return sequence;
+}
+
+void* emitLink(void* node1, void* node2, int offset, int source)
+{
+	bool crit1 = method_getnodekind(node1) == flow::CompareInt32::SymbolId || method_getnodekind(node2) == flow::CompareInt32::SymbolId;
+	bool crit2 = method_getnodekind(node1) == flow::SubtractInt32::SymbolId || method_getnodekind(node2) == flow::SubtractInt32::SymbolId;
+
+	void* a = reinterpret_cast<char*>(node1) + method_table + (prologue_size * 2 * offset) + 0;
+	void* s = reinterpret_cast<char*>(node1) + method_table + (prologue_size * 2 * offset) + prologue_jump;
+
+	void* a1 = reinterpret_cast<char*>(node1) + method_table + (prologue_size * 2 * offset) + 0 + prologue_size;
+	void* s1 = reinterpret_cast<char*>(node1) + method_table + (prologue_size * 2 * offset) + prologue_jump + prologue_size;
+
+
+	//Overwrite the prologue so the correct node and connectors are referenced.
+	emitPrologue( false, a, node2, source);
+	//Overwrite the jump instruction from method_missing to the dynamic receptor of the linked node.
+	emitJump( false, s, reinterpret_cast<char*>(node2) + method_exec);
+
+	//Overwrite the prologue so the correct node and connectors are referenced.
+	emitPrologue( false, a1, node2, source);
+	//Overwrite the jump instruction from method_missing to the dynamic receptor of the linked node.
+	emitJump( false, s1, reinterpret_cast<char*>(node2) + method_pexec);
+
+
+	return 0;
+}
+
+
+void emitDataLink(void* node1, void* node2, int offset1, int offset2)
+{
+	void* a = reinterpret_cast<char*>(node1) - 4 - 8 * offset1;
+	void* s = reinterpret_cast<char*>(node2) - 8 - 8 * offset2;
+	emitRelative(false, s, reinterpret_cast<char*>(a) + *(int*)a);
+}
+
+
+
+
+
+
+
+
+extern aurora::WeakReferenceManager<12, 15> weakreferenceManager;
+
+
+struct ltstr
+{
+  bool operator()(const char* s1, const char* s2) const
+  {
+    return strcmp(s1, s2) < 0;
+  }
+};
+
+
+void* emitNodeMultiConnections( bool preview, void* sequence, TiXmlDocument& doc1, std::map<unsigned int, TiXmlElement*>& node_mappings, std::map<unsigned int, TiXmlElement*>& node_mappings2)
+{
+	std::multimap<const char*, TiXmlElement*, ltstr> connectionMap;
+	
+	
+	TiXmlElement *node;
+	node = doc1.FirstChildElement()->FirstChildElement();
+	for( ; node != 0; node = node->NextSiblingElement()) {
+		if( stricmp(node->Value(), "Connection") == 0x0 && stricmp(node->Attribute("Type"), "Element") == 0x0 ) {
+			connectionMap.insert( 
+				std::make_pair(
+					node->Attribute("Target"),
+					node
+				)
+			);
+		}
+	}
+	
+
+
+
+	int count = 0;
+	std::multimap<const char*, TiXmlElement*, ltstr>::iterator current = connectionMap.begin(), upper, lower2;
+	while( current != connectionMap.end() ) 
+	{
+		lower2   = connectionMap.lower_bound( current->first );		
+		upper   = connectionMap.upper_bound( current->first );		
+		count   = connectionMap.count( current->first );	
+		current = upper;
+
+
+		if( count > 1 )
+		{	
+			char sourceEvent[1024]; char targetEvent[1024]; int targetSlot = -1, sourceSlot = -1;
+			unsigned int source, target; 			
+
+
+			void* methodBody1 = sequence;			
+			for( std::multimap<const char*, TiXmlElement*, ltstr>::iterator lower = lower2; lower != upper; lower++ ) 
+			{				
+				//Resolve the destination				
+				TiXmlElement* connection = lower->second;
+				sscanf(connection->Attribute("Source"), "%x.%s", &source, &sourceEvent);
+				sscanf(connection->Attribute("Target"), "%x.%s", &target, &targetEvent);			
+				strcpy(&sourceEvent[0], 1 + strstr(connection->Attribute("Source"), "."));
+				strcpy(&targetEvent[0], 1 + strstr(connection->Attribute("Target"), "."));
+
+				//Search for the method symbol
+				TiXmlElement *xnode = node_mappings[source]->FirstChildElement();
+				for( int signal = 0; xnode != 0; xnode = xnode->NextSiblingElement()) {
+					if( stricmp(xnode->Value(), "Signal") == 0x0 && stricmp(xnode->Attribute("Type"), "In") == 0x0) { 						
+						if( stricmp(xnode->Attribute("Name"), sourceEvent) == 0x0 ) {
+							sourceSlot = signal;
+							break;
+						}
+						else
+						{
+							signal++;
+						}						
+					}
+				}
+
+				xnode = node_mappings[target]->FirstChildElement();
+				for( int signal = 0; xnode != 0; xnode = xnode->NextSiblingElement()) {
+					if( stricmp(xnode->Value(), "Signal") == 0x0 && stricmp(xnode->Attribute("Type"), "Out") == 0x0 ) { 						
+						if( stricmp(xnode->Attribute("Name"), targetEvent) == 0x0 ) {
+							targetSlot = signal;
+							break;
+						}
+						else
+						{
+							signal++;
+						}						
+					}
+				}
+
+				
+				assert(targetSlot != -1);
+				assert(sourceSlot != -1);		
+				sequence = emitGetRelativeAdress(preview, sequence, node_mappings2[source]->GetUserData());
+				sequence = emitPush8(preview, sequence, sourceSlot);	
+				sequence = emitPushEAX(preview, sequence);
+				sequence = emitCall(preview, sequence, (char*)node_mappings2[source]->GetUserData() + method_exec );
+				sequence = emitAddEsp8(preview, sequence, 8);
+			}
+
+			sequence = emitRet(preview, sequence);
+
+			void* methodBody2 = sequence;			
+			for( std::multimap<const char*, TiXmlElement*, ltstr>::iterator lower = lower2; lower != upper; lower++ ) 
+			{				
+				//Resolve the destination				
+				TiXmlElement* connection = lower->second;
+				sscanf(connection->Attribute("Source"), "%x.%s", &source, &sourceEvent);
+				sscanf(connection->Attribute("Target"), "%x.%s", &target, &targetEvent);			
+				strcpy(&sourceEvent[0], 1 + strstr(connection->Attribute("Source"), "."));
+				strcpy(&targetEvent[0], 1 + strstr(connection->Attribute("Target"), "."));
+
+				//Search for the method symbol
+				TiXmlElement *xnode = node_mappings[source]->FirstChildElement();
+				for( int signal = 0; xnode != 0; xnode = xnode->NextSiblingElement()) {
+					if( stricmp(xnode->Value(), "Signal") == 0x0 && stricmp(xnode->Attribute("Type"), "In") == 0x0) { 						
+						if( stricmp(xnode->Attribute("Name"), sourceEvent) == 0x0 ) {
+							sourceSlot = signal;
+							break;
+						}
+						else
+						{
+							signal++;
+						}						
+					}
+				}
+
+				xnode = node_mappings[target]->FirstChildElement();
+				for( int signal = 0; xnode != 0; xnode = xnode->NextSiblingElement()) {
+					if( stricmp(xnode->Value(), "Signal") == 0x0 && stricmp(xnode->Attribute("Type"), "Out") == 0x0 ) { 						
+						if( stricmp(xnode->Attribute("Name"), targetEvent) == 0x0 ) {
+							targetSlot = signal;
+							break;
+						}
+						else
+						{
+							signal++;
+						}						
+					}
+				}
+
+				
+				assert(targetSlot != -1);
+				assert(sourceSlot != -1);		
+				sequence = emitGetRelativeAdress(preview, sequence, node_mappings2[source]->GetUserData());
+				sequence = emitPush8(preview, sequence, sourceSlot);	
+				sequence = emitPushEAX(preview, sequence);
+				sequence = emitCall(preview, sequence, (char*)node_mappings2[source]->GetUserData() + method_pexec );
+				sequence = emitAddEsp8(preview, sequence, 8);
+			}
+
+			sequence = emitRet(preview, sequence);
+
+
+
+
+
+
+			assert(targetSlot != -1);	
+			void* rtarget = node_mappings2[target]->GetUserData(), *rsource = node_mappings2[source]->GetUserData();
+			assert(rtarget != 0 );
+			assert(rsource != 0 );
+		
+
+			void* a = reinterpret_cast<char*>(rtarget) + method_table + (prologue_size * 2 * targetSlot) + 0;
+			void* s = reinterpret_cast<char*>(rtarget) + method_table + (prologue_size * 2 * targetSlot) + prologue_jump;
+			void* a1 = reinterpret_cast<char*>(rtarget) + method_table + (prologue_size * 2 * targetSlot) + 0 + prologue_size;
+			void* s1 = reinterpret_cast<char*>(rtarget) + method_table + (prologue_size * 2 * targetSlot) + prologue_jump + prologue_size;
+
+			/*
+			//Overwrite the prologue so the correct node and connectors are referenced.
+			emitPrologue( false, a, node2, source);
+			//Overwrite the jump instruction from method_missing to the dynamic receptor of the linked node.
+			emitJump( false, s, reinterpret_cast<char*>(node2) + method_exec);
+			*/
+
+			emitJump( preview, a, methodBody1);
+			emitJump( preview, a1, methodBody2);
+		}				
+	}
+
+
+	/*
+				emitLink(						
+					node_mappings2[target]->GetUserData(),
+					node_mappings2[source]->GetUserData(),
+					targetSlot, sourceSlot
+				);
+	*/
+
+	/*
+	void* a = reinterpret_cast<char*>(node1) + method_table + (prologue_size * 2 * offset) + 0;
+	void* s = reinterpret_cast<char*>(node1) + method_table + (prologue_size * 2 * offset) + prologue_jump;
+
+	void* a1 = reinterpret_cast<char*>(node1) + method_table + (prologue_size * 2 * offset) + 0 + prologue_size;
+	void* s1 = reinterpret_cast<char*>(node1) + method_table + (prologue_size * 2 * offset) + prologue_jump + prologue_size;
+
+
+	//Overwrite the prologue so the correct node and connectors are referenced.
+	emitPrologue( false, a, node2, source);
+	//Overwrite the jump instruction from method_missing to the dynamic receptor of the linked node.
+	emitJump( false, s, reinterpret_cast<char*>(node2) + method_exec);
+
+	//Overwrite the prologue so the correct node and connectors are referenced.
+	emitPrologue( false, a1, node2, source);
+	//Overwrite the jump instruction from method_missing to the dynamic receptor of the linked node.
+	emitJump( false, s1, reinterpret_cast<char*>(node2) + method_pexec);
+	*/
+
+
+
+	/*
+	node = doc1.FirstChildElement()->FirstChildElement();
+	for( ; node != 0; node = node->NextSiblingElement()) {
+		if( stricmp(node->Value(), "Connection") == 0x0 && stricmp(node->Attribute("Type"), "Element") == 0x0 ) {
+			char sourceEvent[1024]; char targetEvent[1024]; int targetSlot = -1, sourceSlot = -1;
+			unsigned int source, target; 
+			sscanf(node->Attribute("Source"), "%x.%s", &source, &sourceEvent);
+			sscanf(node->Attribute("Target"), "%x.%s", &target, &targetEvent);			
+			strcpy(&sourceEvent[0], 1 + strstr(node->Attribute("Source"), "."));
+			strcpy(&targetEvent[0], 1 + strstr(node->Attribute("Target"), "."));
+
+			
+			const char* connectionSource = node->Attribute("Target");
+			std::multimap<const char*, TiXmlElement*, ltstr>::iterator itt 
+				= connectionMap.lower_bound( connectionSource  );
+			std::multimap<const char*, TiXmlElement*, ltstr>::iterator upp 
+				= connectionMap.upper_bound( connectionSource );
+
+			int count = connectionMap.count( connectionSource );
+			if( count > 1 ) 
+			{
+				continue;			
+			}
+
+						
+			TiXmlElement *xnode = node_mappings[source]->FirstChildElement();
+			for( int signal = 0; xnode != 0; xnode = xnode->NextSiblingElement()) {
+				if( stricmp(xnode->Value(), "Signal") == 0x0 && stricmp(xnode->Attribute("Type"), "In") == 0x0) { 						
+					if( stricmp(xnode->Attribute("Name"), sourceEvent) == 0x0 ) {
+						sourceSlot = signal;
+						break;
+					}
+					else
+					{
+						signal++;
+					}						
+				}
+			}
+
+			xnode = node_mappings[target]->FirstChildElement();
+			for( int signal = 0; xnode != 0; xnode = xnode->NextSiblingElement()) {
+				if( stricmp(xnode->Value(), "Signal") == 0x0 && stricmp(xnode->Attribute("Type"), "Out") == 0x0 ) { 						
+					if( stricmp(xnode->Attribute("Name"), targetEvent) == 0x0 ) {
+						targetSlot = signal;
+						break;
+					}
+					else
+					{
+						signal++;
+					}						
+				}
+			}
+
+			if( sourceSlot != -1 && targetSlot != -1  )
+			{
+				emitLink(						
+					node_mappings2[target]->GetUserData(),
+					node_mappings2[source]->GetUserData(),
+					targetSlot, sourceSlot
+				);
+			}
+		}
+	}
+	*/
+
+
+	return sequence;
+}
+
+
+void  parse_overwrite_data(TiXmlDocument& doc1, std::map<unsigned int, TiXmlElement*>& node_mappings, std::map<unsigned int, TiXmlElement*>& node_mappings2)
+{
+	std::multimap<const char*, TiXmlElement*, ltstr> connectionMap;
+	
+	
+	TiXmlElement *node;
+	node = doc1.FirstChildElement()->FirstChildElement();
+	for( ; node != 0; node = node->NextSiblingElement()) {
+		if( stricmp(node->Value(), "Connection") == 0x0 && stricmp(node->Attribute("Type"), "Element") == 0x0 ) {
+			connectionMap.insert( 
+				std::make_pair(
+					node->Attribute("Target"),
+					node
+				)
+			);
+		}
+	}
+	
+
+	node = doc1.FirstChildElement()->FirstChildElement();
+	for( ; node != 0; node = node->NextSiblingElement()) {
+		if( stricmp(node->Value(), "Connection") == 0x0 && stricmp(node->Attribute("Type"), "Element") == 0x0 ) {
+			char sourceEvent[1024]; char targetEvent[1024]; int targetSlot = -1, sourceSlot = -1;
+			unsigned int source, target; 
+			sscanf(node->Attribute("Source"), "%x.%s", &source, &sourceEvent);
+			sscanf(node->Attribute("Target"), "%x.%s", &target, &targetEvent);			
+			strcpy(&sourceEvent[0], 1 + strstr(node->Attribute("Source"), "."));
+			strcpy(&targetEvent[0], 1 + strstr(node->Attribute("Target"), "."));
+
+			
+			const char* connectionSource = node->Attribute("Target");
+			std::multimap<const char*, TiXmlElement*, ltstr>::iterator itt 
+				= connectionMap.lower_bound( connectionSource  );
+			std::multimap<const char*, TiXmlElement*, ltstr>::iterator upp 
+				= connectionMap.upper_bound( connectionSource );
+
+			int count = connectionMap.count( connectionSource );
+			if( count > 1 ) 
+			{
+				continue;			
+			}
+
+					
+			TiXmlElement *xnode = node_mappings[source]->FirstChildElement();
+			for( int signal = 0; xnode != 0; xnode = xnode->NextSiblingElement()) {
+				if( stricmp(xnode->Value(), "Signal") == 0x0 && stricmp(xnode->Attribute("Type"), "In") == 0x0) { 						
+					if( stricmp(xnode->Attribute("Name"), sourceEvent) == 0x0 ) {
+						sourceSlot = signal;
+						break;
+					}
+					else
+					{
+						signal++;
+					}						
+				}
+			}
+
+			xnode = node_mappings[target]->FirstChildElement();
+			for( int signal = 0; xnode != 0; xnode = xnode->NextSiblingElement()) {
+				if( stricmp(xnode->Value(), "Signal") == 0x0 && stricmp(xnode->Attribute("Type"), "Out") == 0x0 ) { 						
+					if( stricmp(xnode->Attribute("Name"), targetEvent) == 0x0 ) {
+						targetSlot = signal;
+						break;
+					}
+					else
+					{
+						signal++;
+					}						
+				}
+			}
+
+			if( sourceSlot != -1 && targetSlot != -1  )
+			{
+				emitLink(						
+					node_mappings2[target]->GetUserData(),
+					node_mappings2[source]->GetUserData(),
+					targetSlot, sourceSlot
+				);
+			}
+		}
+	}
+
+	node = doc1.FirstChildElement()->FirstChildElement();
+	for( ; node != 0; node = node->NextSiblingElement()) {
+		if( stricmp(node->Value(), "Connection") == 0x0 ) {
+			char sourceEvent[1024]; char targetEvent[1024]; int targetSlot = -1, sourceSlot = -1;
+			unsigned int source, target; 
+			sscanf(node->Attribute("Source"), "%x.%s", &source, &sourceEvent);
+			sscanf(node->Attribute("Target"), "%x.%s", &target, &targetEvent);	
+			strcpy(&sourceEvent[0], 1 + strstr(node->Attribute("Source"), "."));
+			strcpy(&targetEvent[0], 1 + strstr(node->Attribute("Target"), "."));
+						
+			TiXmlElement *xnode = node_mappings[source]->FirstChildElement();
+			for( int signal = 0; xnode != 0; xnode = xnode->NextSiblingElement()) {
+				if( stricmp(xnode->Value(), "Member") == 0x0 ) { 						
+					if( stricmp(xnode->Attribute("Name"), sourceEvent) == 0x0 ) {
+						sourceSlot = signal;
+						break;
+					}
+					else
+					{
+						signal++;
+					}						
+				}
+			}
+
+			xnode = node_mappings[target]->FirstChildElement();
+			for( int signal = 0; xnode != 0; xnode = xnode->NextSiblingElement()) {
+				if( stricmp(xnode->Value(), "Member") == 0x0 ) { 						
+					if( stricmp(xnode->Attribute("Name"), targetEvent) == 0x0 ) {
+						targetSlot = signal;
+						break;
+					}
+					else
+					{
+						signal++;
+					}						
+				}
+			}
+
+			if( sourceSlot != -1 && targetSlot != -1  )
+			{
+				emitDataLink(
+					node_mappings2[target]->GetUserData(),
+					node_mappings2[source]->GetUserData(),
+					targetSlot, sourceSlot
+				);
+			}
+		}
+	}
+}
+
+
+void* parse(const char* metaformat, const char* filename, int& outputSize)
+{
+	if( metaformat == 0x0 )
+	{
+		printf("No meta-format specified\r\n");
+		return 0;
+	}
+
+	if( filename == 0x0 )
+	{
+		printf("No meta-format specified\r\n");
+		return 0;
+	}
+
+
+	
+
+
+	//Perform loading of the document
+	TiXmlDocument doc1, doc2;
+	doc1.LoadFile(filename);
+	doc2.LoadFile(metaformat);
+	if( doc1.Error() || doc1.FirstChildElement() == 0 || stricmp(doc1.FirstChildElement()->Value(), "Flow") != 0x0 )
+	{
+		printf("File contains errors\r\n");
+		return 0;
+	}
+	else if( doc2.Error() || doc2.FirstChildElement() == 0 || stricmp(doc2.FirstChildElement()->Value(), "Flow") != 0x0 )
+	{
+		printf("Meta-model contains errors\r\n");
+		return 0;
+	}
+	else
+	{			
+		const int maxSize = 4096 * 11;
+		FlowHeader header = { 0 };
+		void* address, *sequence, *a, *b; 
+		address = sequence = _aligned_malloc(maxSize, 4096);
+		memset(address, 0x90,  maxSize);
+
+		//Auxillary data structures
+		TiXmlElement *node; void* weakReferenceTable, *countedReferenceTable;
+		std::map<std::string,  int>			  type_ordialmapping;
+		std::map<std::string,  TiXmlElement*> type_descriptor;
+		std::map<unsigned int, TiXmlElement*> node_mappings;
+		std::map<unsigned int, TiXmlElement*> node_mappings2;		
+		std::map<std::string, void*>		  stringInterning;
+		unsigned int tokenCount = 0; 
+
+		
+
+
+		//Generate node ordial mapping
+		assert(doc2.FirstChildElement());
+		assert(doc2.FirstChildElement()->FirstChildElement());
+		node = doc2.FirstChildElement()->FirstChildElement();
+		for( int lastOrdial = 0; node != 0; node = node->NextSiblingElement()) {
+			if( stricmp(node->Value(), "Node") == 0x0 ) {
+				type_descriptor.insert( std::make_pair( 
+					std::string( node->Attribute("Name") ), node ) );
+				type_ordialmapping[node->Attribute("Name")] = 
+					lastOrdial++;
+			}			
+		}
+
+		//Generate node mapping
+		node = doc1.FirstChildElement()->FirstChildElement();
+		for( ; node != 0; node = node->NextSiblingElement()) 
+		{		
+			if( stricmp(node->Value(), "Node") == 0x0 ) 
+			{				
+				//Deserialize the unique identifier for the node.
+				unsigned int uniquenodeid; 
+				sscanf(node->Attribute("Id"), "%x", &uniquenodeid);
+				node_mappings[uniquenodeid] = type_descriptor[std::string(node->Attribute("Type"))];				
+				node_mappings2[uniquenodeid] = node;
+			}				
+		}
+		
+		//Generate string interning and count number of token types.
+		node = doc1.FirstChildElement()->FirstChildElement();
+		for( ; node != 0; node = node->NextSiblingElement()) 
+		{		
+			if( stricmp(node->Value(), "Node") == 0x0 ) 
+			{	
+				//Deserialize the unique identifier for the node.
+				unsigned int uniquenodeid; 
+				sscanf(node->Attribute("Id"), "%x", &uniquenodeid);
+				emitPreNodeData( node, node_mappings[uniquenodeid], tokenCount, stringInterning );				
+			}
+		}
+
+
+		//Relptr:firstnode
+		sequence = emitRelative(false, sequence, sequence);
+		//Relptr:table_refcount
+		sequence = emitRelative(false,sequence, sequence);
+		//Relptr:table_reftokens
+		sequence = emitRelative(false, sequence, sequence);
+		//Relptr:global_data
+		sequence = emitRelative(false, sequence, sequence);
+
+		node = doc1.FirstChildElement()->FirstChildElement();
+		for( ; node != 0; node = node->NextSiblingElement()) 
+		{		
+			if( stricmp(node->Value(), "Node") == 0x0 ) 
+			{	
+				unsigned int uniquenodeid; 
+				sscanf(node->Attribute("Id"), "%x", &uniquenodeid);
+				sequence = emitNode(false, type_ordialmapping[node->Attribute("Type")], sequence,
+					&header, a, node, node_mappings[uniquenodeid], address );
+				node->SetUserData(a);
+				assert( ((char*)sequence - (char*)address) < maxSize );
+			}
+		}
+
+		sequence = emitNodeMultiConnections(false, sequence, doc1, 
+			node_mappings, node_mappings2);
+		assert( ((char*)sequence - (char*)address) < maxSize );
+
+		node = doc1.FirstChildElement()->FirstChildElement();
+		for( ; node != 0; node = node->NextSiblingElement()) 
+		{		
+			if( stricmp(node->Value(), "Node") == 0x0 ) 
+			{				
+				unsigned int uniquenodeid; 
+				sscanf(node->Attribute("Id"), "%x", &uniquenodeid);
+				sequence = emitNodePrologue(false, sequence, node->GetUserData(), 
+					node, node_mappings[uniquenodeid] );				
+				assert( ((char*)sequence - (char*)address) < maxSize );
+			}
+		}
+		
+		countedReferenceTable = sequence;
+		unsigned int* referenceCounter = (unsigned int*)sequence;
+		sequence = (char*)sequence + sizeof(unsigned int) * aurora::WeakReferenceManager<12, 15>::MaxEntries;
+		
+		aurora::WeakReferenceManager<12, 15>* w = new (sequence) aurora::WeakReferenceManager<12, 15>(); sequence = w;	
+		weakReferenceTable = sequence;
+		sequence = (char*)sequence + sizeof(aurora::WeakReferenceManager<12, 15>);
+		assert( ((char*)sequence - (char*)address) < maxSize );
+
+
+		std::map<std::string, void*>::iterator itt;
+		for( itt = stringInterning.begin(); itt != stringInterning.end(); ++itt )
+		{			
+			stringInterning[itt->first] = sequence;
+			sequence = emitCharLiteral(false, sequence, itt->first.c_str());				
+			assert( ((char*)sequence - (char*)address) < maxSize );
+		}
+		
+		node = doc1.FirstChildElement()->FirstChildElement();
+		for( ; node != 0; node = node->NextSiblingElement()) 
+		{		
+			if( stricmp(node->Value(), "Node") == 0x0 ) 
+			{	
+				//Deserialize the unique identifier for the node.
+				unsigned int uniquenodeid; 
+				sscanf(node->Attribute("Id"), "%x", &uniquenodeid);
+				sequence = emitNodeData(false,
+					sequence, node->GetUserData(), node, node_mappings[uniquenodeid], address, referenceCounter, 
+					*w, stringInterning, node_mappings, node_mappings2);
+				assert( ((char*)sequence - (char*)address) < maxSize );
+			}
+		}
+		
+
+		parse_overwrite_data(doc1, node_mappings, node_mappings2);		
+		emitRelative(false, (char*)address + 0, header.head);
+		emitRelative(false, (char*)address + 4, countedReferenceTable);		
+		emitRelative(false, (char*)address + 8, weakReferenceTable);
+
+
+		outputSize = maxSize;
+		int size =  (char*)sequence - (char*)address ;
+		assert( size < maxSize );
+		return address;
+	}			
+}
+
+
+
+typedef void (__cdecl *method_signature)(void* a, int signal);
+void dynamic_receptors_link(std::map<int, method_signature> const& functionMapping, std::map<int, method_signature> const& coerceMapping, method_signature def, void* adress)
+{
+	std::map<int, method_signature>::const_iterator itt;
+	void *f = method_getfirst(adress), *n = f;
+	if( f != 0 ) do 
+	{
+		void* prev = f;
+		int kind = method_getnodekind(prev);			
+			
+		itt = functionMapping.find(kind);
+		if( itt != functionMapping.end() ) {				
+			emitJump(false, reinterpret_cast<char*>(prev) + method_exec, itt->second);
+		} else {
+			if( def != 0x0 ) {
+				emitJump(false, reinterpret_cast<char*>(prev) + method_exec, def);
+			}
+		}
+		
+		itt = coerceMapping.find(kind);
+		if( itt != coerceMapping.end() ) {				
+			emitJump(false, reinterpret_cast<char*>(prev) + method_pexec2, itt->second);
+		}		
+
+	} while( n != (f = method_next(f)) );
+}
+
+
+void* load(void* global, void* address, int maxSize)
+{
+	//Set global data
+	char* baseImage = (char*)address; baseImage += 12;
+	*reinterpret_cast<void**>(baseImage) = global;	
+
+
+	DWORD oldExecutingMode;
+	VirtualProtect(address, maxSize, PAGE_EXECUTE_READWRITE, &oldExecutingMode );
+	FlushInstructionCache(GetCurrentProcess(), address, maxSize );	
+	return address;
+}
+
+void unload(void* address)
+{
+	//Reset the virtual procetion mode to the default read/write memory.
+	DWORD oldExecutingMode;
+	VirtualProtect(address, 4096, PAGE_READWRITE, &oldExecutingMode );  
+	//Free the actual memory.
+	_aligned_free(address);
+}
+
+

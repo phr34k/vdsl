@@ -1,0 +1,537 @@
+﻿<Window x:Class="Aurora.SandboxDesigner.Window1"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:s="clr-namespace:Aurora.SandboxDesigner.Controls"
+    xmlns:local="clr-namespace:Aurora.SandboxDesigner"        
+    Title="Window1" Height="278" Width="571">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Name="MenuToolBarTray">
+            <MenuItem Header="File">
+                <MenuItem Header="New" Command="New" />
+                <MenuItem Header="Open" Command="Open" />
+                <MenuItem Header="Save" Command="Save" />                
+                <MenuItem Header="SaveAs" Command="SaveAs" />                               
+            </MenuItem>
+            <MenuItem Header="Edit">
+                <MenuItem Header="Refresh" Command="s:DesignerCanvasCommands.Refresh" />
+            </MenuItem>
+            <MenuItem Header="Debug">
+                <MenuItem Header="Start" Command="local:DebugCommands.Start" />
+            </MenuItem>
+        </Menu>
+        <s:GraphNodeDiagramDesigner x:Name="canvas1" AllowDrop="True" Margin="0,0,0,0">
+            <s:GraphNodeDiagramDesigner.Resources>
+                <ResourceDictionary>
+                    <ResourceDictionary.MergedDictionaries>
+                        <ResourceDictionary Source="/Themes/GraphDesigner.xaml" />
+                    </ResourceDictionary.MergedDictionaries>
+
+
+                    <ControlTemplate x:Key="NormalDesignerTemplateB" TargetType="{x:Type s:DesignerItem}" xmlns:System="clr-namespace:System;assembly=mscorlib">
+                        <ControlTemplate.Resources>
+                            <System:Double x:Key="Radius">60</System:Double>
+                        </ControlTemplate.Resources>
+                        <Grid Focusable="True">
+                            <Border BorderThickness="1" BorderBrush="Black" Focusable="True" Background="{TemplateBinding Background}">
+                                <Border.CornerRadius>
+                                    <CornerRadius TopLeft="{StaticResource Radius}" TopRight="{StaticResource Radius}"
+                                  BottomLeft="{StaticResource Radius}" BottomRight="{StaticResource Radius}"/>
+                                </Border.CornerRadius>
+                                <Grid Focusable="True">
+                                    <Rectangle Stroke="{Binding Brush, Mode=OneWay}" Fill="Transparent" 
+                               StrokeThickness="2" RadiusX="{StaticResource Radius}" RadiusY="{StaticResource Radius}" />
+                                    <Rectangle Name="Part_SelectionRect" StrokeDashArray="0.5 1.0 0.3" Stroke="Black" StrokeThickness="1" 
+                               RadiusX="{StaticResource Radius}" RadiusY="{StaticResource Radius}" Margin="0.9" 
+                        Visibility="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type s:DesignerItem}}, Converter={StaticResource BooleanToVisibility}}" />
+                                    <s:MoveThumb DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=.}" 
+                                 Cursor="SizeAll" Template="{StaticResource MoveThumbTemplate}" Focusable="True" />
+                                    <ContentPresenter x:Name="Part_Content" Margin="10,3" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+
+                    <ControlTemplate x:Key="NormalDesignerTemplate" TargetType="{x:Type s:DesignerItem}">
+                        <Grid>
+                            <Border Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="Black" CornerRadius="10" >
+                                <Grid>
+                                    <Rectangle Stroke="{Binding Brush, Mode=OneWay}" Fill="Transparent"  StrokeThickness="2" RadiusX="10" RadiusY="10">
+                                        <!--
+                                            <Rectangle.Effect>
+                                                <DropShadowEffect ShadowDepth="0"
+                                                  Color="Gold"
+                                                  Opacity="1"
+                                                  BlurRadius="6"/>
+                                            </Rectangle.Effect>
+                                            -->
+                                    </Rectangle>
+                                    <Rectangle Name="Part_SelectionRect" StrokeDashArray="0.5 1.0 0.3" Stroke="Black" StrokeThickness="1" RadiusX="10" RadiusY="10" Margin="3.9" 
+                                                       Visibility="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type s:DesignerItem}}, 
+                                Converter={StaticResource BooleanToVisibility}}" />
+                                    <s:MoveThumb DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=.}" Cursor="SizeAll" />
+                                    <ContentPresenter Name="Part_Content" Margin="10,3" VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+
+                    <DataTemplate x:Key="MyParam2">
+                        <DataTemplate.Resources>
+                            <s:GraphEnumConverter x:Key="GraphEnumConverter" x:Name="GraphEnumConverter" />
+                        </DataTemplate.Resources>
+                        <!--
+                                <ComboBox Text="{Binding Value, Mode=TwoWay}" HorizontalAlignment="Stretch" 
+                                           />                               
+                                -->
+                        <s:EnumField Text="{Binding Value, Mode=TwoWay}" Tag="{Binding Name, Mode=TwoWay}" ItemsSource="{Binding ., Converter={StaticResource GraphEnumConverter}}" />
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="MyParam3">
+                        <s:Vector3 Text="{Binding Value, Mode=TwoWay}" Tag="{Binding Name, Mode=TwoWay}" />
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="MyParam4">
+                        <s:Vector2 Text="{Binding Value, Mode=TwoWay}" Tag="{Binding Name, Mode=TwoWay}" />
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="MyParam5">
+                        <s:Vector4 Text="{Binding Value, Mode=TwoWay}" Tag="{Binding Name, Mode=TwoWay}" />
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="MyParam6">
+                        <s:Vector1 Text="{Binding Value, Mode=TwoWay}" Tag="{Binding Name, Mode=TwoWay}" />
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="MyParam7">
+                        <s:BooleanField Text="{Binding Value, Mode=TwoWay}" Tag="{Binding Name, Mode=TwoWay}" />
+                    </DataTemplate>
+
+
+
+
+                    <Style x:Key="DefaultStyle" TargetType="{x:Type s:DesignerItem}">
+                        <Setter Property="Template" Value="{StaticResource NormalDesignerTemplate}" />
+                        <Setter Property="MinWidth" Value="150" />
+                        <Setter Property="MinHeight" Value="30" />
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="Gainsboro" Offset="0.0" />
+                                    <GradientStop Color="White" Offset="1" />
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+
+                    <Style x:Key="ParameterGroupStyle" TargetType="{x:Type s:DesignerItem}">
+                        <Setter Property="Template" Value="{StaticResource NormalDesignerTemplateB}" />
+                        <Setter Property="MinWidth" Value="150" />
+                        <Setter Property="MinHeight" Value="30" />
+
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="DarkGray" Offset="0.0" />
+                                    <GradientStop Color="Gray" Offset="1" />
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Foreground" Value="White" />
+                    </Style>
+                    
+                    <Style x:Key="ToggleGroupStyle" TargetType="{x:Type s:DesignerItem}">
+                        <Style.Resources>
+                            <DataTemplate DataType="{x:Type s:GraphNodeItem}">
+                                <StackPanel Margin="2">
+                                    <Grid Margin="10,0,10,0">
+                                        <Grid.RowDefinitions >
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                    </Grid>
+                                </StackPanel>
+                            </DataTemplate>
+                        </Style.Resources>
+                        
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type s:DesignerItem}" xmlns:System="clr-namespace:System;assembly=mscorlib">
+                                    <ControlTemplate.Resources>
+                                        <System:Double x:Key="Radius">60</System:Double>
+                                    </ControlTemplate.Resources>
+                                    <Grid Focusable="True">
+                                        <Border Focusable="True" Background="{TemplateBinding Background}">
+                                            <Grid Focusable="True">
+                                                <!--<Rectangle Stroke="{Binding Brush, Mode=OneWay}" Fill="Transparent" 
+                               StrokeThickness="2" RadiusX="{StaticResource Radius}" RadiusY="{StaticResource Radius}" />-->
+                                                
+
+                                                <Polygon x:Name="PolygonX" IsHitTestVisible="False"
+                                                         Margin="10" Points="0,0 13,5, 0,10" Stroke="Green" Fill="LimeGreen"                                                         
+                                                         Stretch="Uniform" StrokeThickness="2"  />
+                                                
+
+                                                <Polygon Margin="2" Points="0,-1 14,4, 14,6, 0,11" StrokeDashArray="0.5 1.0 0.3" 
+                                                         Stroke="Black" StrokeThickness="1" Fill="Transparent" 
+                                                         Stretch="Uniform"
+                                                         Visibility="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type s:DesignerItem}}, Converter={StaticResource BooleanToVisibility}}"                                                         
+                                                         />                                                
+
+                                                <TextBlock Text=">=" FontSize="48" Padding="0" Margin="0"                                                        IsHitTestVisible="False" 
+                                                       VerticalAlignment="Center" HorizontalAlignment="Center" ClipToBounds="False"  />
+
+                                                    <s:MoveThumb DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=.}" 
+                                                    Cursor="SizeAll" Template="{StaticResource MoveThumbTemplate}" Focusable="True" 
+                                                />                                                
+
+                                                <!--<ContentPresenter x:Name="Part_Content" Margin="10,3" VerticalAlignment="Center" />-->
+                                                
+
+                                                <StackPanel VerticalAlignment="Center" DataContext="{Binding .}" 
+                                                      xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                                                    <StackPanel.Resources>
+                                                        <s:GraphPropertySelector x:Key="GraphPropertySelector" />
+                                                    </StackPanel.Resources>
+                                                    
+                                                    <Grid DataContext="{Binding Path=Inputs, Converter={StaticResource GraphPropertySelector}, ConverterParameter=0}">
+                                                        <TextBlock Text="{Binding Name}" HorizontalAlignment="Left" IsHitTestVisible="False" />
+                                                        <s:Connector Normal="-30,0" Group="Sink"
+                                                             VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-10,1,10,-1" />
+                                                    </Grid>
+
+                                                    <Grid DataContext="{Binding Path=Outputs, Converter={StaticResource GraphPropertySelector}, ConverterParameter=0}">
+                                                        <TextBlock Text="{Binding Name}" HorizontalAlignment="Right" IsHitTestVisible="False" />
+                                                        <s:Connector Normal="30,0" Group="Source"
+                                                            VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,1,-10,-1" />
+                                                    </Grid>
+
+                                                    <Grid DataContext="{Binding Path=Inputs, Converter={StaticResource GraphPropertySelector}, ConverterParameter=1}">
+                                                        <TextBlock Text="{Binding Name}" HorizontalAlignment="Left" IsHitTestVisible="False" />
+                                                        <s:Connector Normal="-30,0" Group="Sink"
+                                                            VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-10,1,10,-1" />                                                
+                                                     </Grid>
+                                                </StackPanel>
+                                                
+
+
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="MinWidth" Value="120" />
+                        <Setter Property="MinHeight" Value="30" />
+
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <SolidColorBrush Color="Transparent" />
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Foreground" Value="Black" />
+                    </Style>
+
+
+                    <Style x:Key="ToggleGroupStyle2" TargetType="{x:Type s:DesignerItem}">
+                        <Style.Resources>
+                            <DataTemplate DataType="{x:Type s:GraphNodeItem}">
+                                <StackPanel Margin="2">
+                                    <Grid Margin="10,0,10,0">
+                                        <Grid.RowDefinitions >
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                    </Grid>
+                                </StackPanel>
+                            </DataTemplate>
+                        </Style.Resources>
+
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type s:DesignerItem}" xmlns:System="clr-namespace:System;assembly=mscorlib">
+                                    <ControlTemplate.Resources>
+                                        <System:Double x:Key="Radius">60</System:Double>
+                                    </ControlTemplate.Resources>
+                                    <Grid Focusable="True">
+                                        <Border Focusable="True" Background="{TemplateBinding Background}">
+                                            <Grid Focusable="True">
+                                                <!--<Rectangle Stroke="{Binding Brush, Mode=OneWay}" Fill="Transparent" 
+                               StrokeThickness="2" RadiusX="{StaticResource Radius}" RadiusY="{StaticResource Radius}" />-->
+
+                                                <!--
+                                                <Polygon x:Name="PolygonX" IsHitTestVisible="False"
+                                                         Margin="10" Points="0,0 13,5, 0,10" Stroke="Green" Fill="LimeGreen"                                                         
+                                                         Stretch="Uniform" StrokeThickness="2"  />
+                                                
+
+                                                <Polygon Margin="2" Points="0,-1 14,4, 14,6, 0,11" StrokeDashArray="0.5 1.0 0.3" 
+                                                         Stroke="Black" StrokeThickness="1" Fill="Transparent" 
+                                                         Stretch="Uniform"
+                                                         Visibility="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type s:DesignerItem}}, Converter={StaticResource BooleanToVisibility}}"                                                         
+                                                         />
+                                                -->
+
+                                                <Polygon x:Name="PolygonX" IsHitTestVisible="False"
+                                                         Margin="10" Points="13,0 0,5, 13,10" Stroke="Green" Fill="LimeGreen"                                                         
+                                                         Stretch="Uniform" StrokeThickness="2"  />
+
+                                                <Polygon Margin="2" Points="14,-1 0,4, 0,6, 14,11" StrokeDashArray="0.5 1.0 0.3" 
+                                                         Stroke="Black" StrokeThickness="1" Fill="Transparent" 
+                                                         Stretch="Uniform"
+                                                         Visibility="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type s:DesignerItem}}, Converter={StaticResource BooleanToVisibility}}"                                                         
+                                                         />
+
+                                                <TextBlock Text=">=" FontSize="48" Padding="0" Margin="0"                                                        IsHitTestVisible="False" 
+                                                       VerticalAlignment="Center" HorizontalAlignment="Center" ClipToBounds="False"  />
+
+                                                <s:MoveThumb DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=.}" 
+                                                    Cursor="SizeAll" Template="{StaticResource MoveThumbTemplate}" Focusable="True" 
+                                                />
+
+                                                <!--<ContentPresenter x:Name="Part_Content" Margin="10,3" VerticalAlignment="Center" />-->
+
+
+                                                <StackPanel VerticalAlignment="Center" DataContext="{Binding .}" 
+                                                      xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                                                    <StackPanel.Resources>
+                                                        <s:GraphPropertySelector x:Key="GraphPropertySelector" />
+                                                    </StackPanel.Resources>
+
+                                                    <Grid DataContext="{Binding Path=Outputs, Converter={StaticResource GraphPropertySelector}, ConverterParameter=0}">
+                                                        <TextBlock Text="{Binding Name}" HorizontalAlignment="Right" IsHitTestVisible="False" />
+                                                        <s:Connector Normal="30,0" Group="Source"
+                                                            VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,1,-10,-1" />
+                                                    </Grid>
+
+                                                    <Grid DataContext="{Binding Path=Inputs, Converter={StaticResource GraphPropertySelector}, ConverterParameter=0}">
+                                                        <TextBlock Text="{Binding Name}" HorizontalAlignment="Left" IsHitTestVisible="False" />
+                                                        <s:Connector Normal="-30,0" Group="Sink"
+                                                             VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-10,1,10,-1" />                                                                                                               
+                                                    </Grid>
+
+                                                    <Grid DataContext="{Binding Path=Outputs, Converter={StaticResource GraphPropertySelector}, ConverterParameter=1}">
+                                                        <TextBlock Text="{Binding Name}" HorizontalAlignment="Right" IsHitTestVisible="False" />
+                                                        <s:Connector Normal="30,0" Group="Source"
+                                                            VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,1,-10,-1" />
+                                                    </Grid>
+                                                </StackPanel>
+
+
+
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="MinWidth" Value="120" />
+                        <Setter Property="MinHeight" Value="30" />
+
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <SolidColorBrush Color="Transparent" />
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Foreground" Value="Black" />
+                    </Style>
+
+                    <Style TargetType="{x:Type s:DesignerItem}">
+                        <Setter Property="Template" Value="{StaticResource NormalDesignerTemplate}" />
+                        <Setter Property="MinWidth" Value="150" />
+                        <Setter Property="MinHeight" Value="30" />
+
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="LightGray" Offset="0.0" />
+                                    <GradientStop Color="LightSlateGray" Offset="1" />
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Foreground" Value="White" />
+                    </Style>
+
+
+
+
+
+
+                    <Style TargetType="{x:Type s:DesignerContextMenu}">
+                        <Setter Property="Control.BorderThickness" Value="1" />
+                        <Setter Property="Control.BorderBrush" Value="#FF959595" />
+                        <Setter Property="Control.Background" Value="#FFF5F5F5" />
+                        <Setter Property="SnapsToDevicePixels" Value="True" />
+                        <Setter Property="OverridesDefaultStyle" Value="True" />
+                        <Setter Property="Grid.IsSharedSizeScope" Value="true" />
+                        <Setter Property="HasDropShadow" Value="True" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type s:DesignerContextMenu}">
+                                    <Border x:Name="Border" Background="{TemplateBinding Control.Background}" BorderBrush="{TemplateBinding Control.BorderBrush}" BorderThickness="{TemplateBinding Control.BorderThickness}">
+                                        <StackPanel KeyboardNavigation.DirectionalNavigation="Cycle">
+                                            <TextBox Background="Transparent" FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" MinWidth="200" 
+                                                     x:Name="Part_UINodeFilter" 
+                                                     Focusable="True" KeyboardNavigation.DirectionalNavigation="None" />
+                                            <Separator Focusable="False" />
+                                            <ScrollViewer MinHeight="250"  MaxHeight="250" HorizontalScrollBarVisibility="Hidden" 
+                                                                  VerticalScrollBarVisibility="Visible" >
+                                                <!-- <StackPanel IsItemsHost="True" /> -->
+
+                                                <TreeView ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType={x:Type s:DesignerContextMenu}}}"
+                                                            x:Name="Part_TreeView" >
+                                                    <TreeView.Resources>
+                                                        <ControlTemplate TargetType="{x:Type TreeViewItem}" x:Key="TreeViewItemTemplate">
+                                                            <StackPanel>
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto" MinWidth="19" />
+                                                                        <ColumnDefinition Width="*" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <Grid.RowDefinitions>
+                                                                        <RowDefinition Height="Auto" />
+                                                                        <RowDefinition />
+                                                                    </Grid.RowDefinitions>
+                                                                    <!--
+                             Note that the following do not work, but I believe the top 2 should?!
+                             <ToggleButton IsChecked="{TemplateBinding IsExpanded}" ClickMode="Press" Name="Expander">
+                             <ToggleButton IsChecked="{TemplateBinding Property=IsExpanded}" ClickMode="Press" Name="Expander">
+                             <ToggleButton IsChecked="{TemplateBinding Path=IsExpanded}" ClickMode="Press" Name="Expander">
+                        -->
+                                                                    <ToggleButton IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press" Name="Expander">
+                                                                        <ToggleButton.Style>
+                                                                            <Style TargetType="ToggleButton">
+                                                                                <Setter Property="UIElement.Focusable" Value="false" />
+                                                                                <Setter Property="FrameworkElement.Width" Value="16" />
+                                                                                <Setter Property="FrameworkElement.Height" Value="16" />
+                                                                                <Setter Property="Control.Template">
+                                                                                    <Setter.Value>
+                                                                                        <ControlTemplate TargetType="ToggleButton">
+                                                                                            <Border Padding="5,5,5,5" Background="#00FFFFFF" Width="16" Height="16">
+                                                                                                <Path Fill="#00FFFFFF" Stroke="#FF989898" Name="ExpandPath">
+                                                                                                    <Path.Data>
+                                                                                                        <PathGeometry Figures="M0,0L0,6L6,0z" />
+                                                                                                    </Path.Data>
+                                                                                                    <Path.RenderTransform>
+                                                                                                        <RotateTransform Angle="135" CenterX="3" CenterY="3" />
+                                                                                                    </Path.RenderTransform>
+                                                                                                </Path>
+                                                                                            </Border>
+                                                                                            <ControlTemplate.Triggers>
+                                                                                                <Trigger Property="UIElement.IsMouseOver" Value="True">
+                                                                                                    <Setter TargetName="ExpandPath" Property="Shape.Stroke" Value="#FF1BBBFA" />
+                                                                                                    <Setter TargetName="ExpandPath" Property="Shape.Fill" Value="#00FFFFFF" />
+                                                                                                </Trigger>
+                                                                                                <Trigger Property="ToggleButton.IsChecked" Value="True">
+                                                                                                    <Setter TargetName="ExpandPath" Property="UIElement.RenderTransform">
+                                                                                                        <Setter.Value>
+                                                                                                            <RotateTransform Angle="180" CenterX="3" CenterY="3" />
+                                                                                                        </Setter.Value>
+                                                                                                    </Setter>
+                                                                                                    <Setter TargetName="ExpandPath" Property="Shape.Fill" Value="#FF595959" />
+                                                                                                    <Setter TargetName="ExpandPath" Property="Shape.Stroke" Value="#FF262626" />
+                                                                                                </Trigger>
+                                                                                            </ControlTemplate.Triggers>
+                                                                                        </ControlTemplate>
+                                                                                    </Setter.Value>
+                                                                                </Setter>
+                                                                            </Style>
+                                                                        </ToggleButton.Style>
+                                                                    </ToggleButton>
+                                                                    <Border x:Name="Bd"
+                                                                                            HorizontalAlignment="Stretch"
+                                                                                            BorderThickness="{TemplateBinding Border.BorderThickness}"
+                                                                                            BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                                                                            Padding="{TemplateBinding Control.Padding}"
+                                                                                            Background="{TemplateBinding Panel.Background}"
+                                                                                            SnapsToDevicePixels="True"
+                                                                                            Grid.Column="1">
+                                                                        <ContentPresenter x:Name="PART_Header"
+                                                                                                Content="{TemplateBinding HeaderedContentControl.Header}"
+                                                                                                ContentTemplate="{TemplateBinding HeaderedContentControl.HeaderTemplate}"
+                                                                                                ContentStringFormat="{TemplateBinding HeaderedItemsControl.HeaderStringFormat}"
+                                                                                                ContentTemplateSelector="{TemplateBinding HeaderedItemsControl.HeaderTemplateSelector}"
+                                                                                                ContentSource="Header"
+                                                                                                HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
+                                                                                                SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                                                                    </Border>
+                                                                    <ItemsPresenter x:Name="ItemsHost" Grid.Column="1" Grid.Row="1" />
+                                                                </Grid>
+                                                            </StackPanel>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="TreeViewItem.IsExpanded" Value="False">
+                                                                    <Setter TargetName="ItemsHost" Property="UIElement.Visibility" Value="Collapsed" />
+                                                                </Trigger>
+                                                                <Trigger Property="ItemsControl.HasItems" Value="False">
+                                                                    <Setter TargetName="Expander" Property="UIElement.Visibility" Value="Hidden" />
+                                                                </Trigger>
+                                                                <Trigger Property="TreeViewItem.IsSelected" Value="True">
+                                                                    <Setter TargetName="Bd" Property="Panel.Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                                                                    <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                                                                </Trigger>
+                                                                <MultiTrigger>
+                                                                    <MultiTrigger.Conditions>
+                                                                        <Condition Property="TreeViewItem.IsSelected" Value="True" />
+                                                                        <Condition Property="Selector.IsSelectionActive" Value="False" />
+                                                                    </MultiTrigger.Conditions>
+                                                                    <Setter TargetName="Bd" Property="Panel.Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+                                                                    <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                                                                </MultiTrigger>
+                                                                <Trigger Property="UIElement.IsEnabled" Value="False">
+                                                                    <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+
+                                                        <Style TargetType="{x:Type TreeViewItem}">
+
+                                                            <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay}" />
+                                                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                                                        </Style>
+                                                    </TreeView.Resources>
+                                                    <TreeView.ItemTemplate>
+                                                        <HierarchicalDataTemplate ItemsSource="{Binding Items.View}">
+                                                            <HierarchicalDataTemplate.ItemTemplate>
+                                                                <HierarchicalDataTemplate>
+                                                                    <TextBlock Text="{Binding Path=Name}" />
+                                                                </HierarchicalDataTemplate>
+                                                            </HierarchicalDataTemplate.ItemTemplate>
+                                                            <TextBlock Text="{Binding Path=Name}" />
+                                                        </HierarchicalDataTemplate>
+                                                    </TreeView.ItemTemplate>
+                                                    <TreeView.ItemContainerStyle>
+                                                        <Style TargetType="{x:Type TreeViewItem}">
+                                                            <Setter Property="Template" Value="{StaticResource TreeViewItemTemplate}" />
+                                                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                                                            <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay}" />
+                                                            <Setter Property="s:MouseDoubleClick.Command"
+                                                                        Value="{x:Static s:GraphNodeDiagramDesigner.ItemPressedCommand}"/>
+                                                            <Setter Property="s:MouseDoubleClick.CommandParameter"
+                                                                        Value="{Binding}"/>
+                                                        </Style>
+                                                    </TreeView.ItemContainerStyle>
+                                                </TreeView>
+                                            </ScrollViewer>
+                                        </StackPanel>
+                                    </Border>
+
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+
+                </ResourceDictionary>
+
+            </s:GraphNodeDiagramDesigner.Resources>
+        </s:GraphNodeDiagramDesigner>
+    </DockPanel>
+</Window>

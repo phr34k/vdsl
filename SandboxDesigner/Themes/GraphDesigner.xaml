@@ -1,0 +1,343 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Aurora.SandboxDesigner"
+    xmlns:s="clr-namespace:Aurora.SandboxDesigner.Controls">
+  
+
+    <DrawingBrush x:Key="CanvasCell" Viewport="0,0,30,30" ViewportUnits="Absolute" TileMode="Tile">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Geometry="M0,0 L1,0 1,0.01, 0,0.01Z" Brush="LightSlateGray" />
+                <GeometryDrawing Geometry="M0,0 L0,1 0.01,1, 0.01,0Z" Brush="LightSlateGray" />
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    
+    <Style TargetType="{x:Type s:DesignerScrollViewer}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:DesignerScrollViewer}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition  />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" BorderThickness="0,1,1,1">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource BorderMediumColor}" />
+                            </Border.BorderBrush>
+                            <ScrollContentPresenter />
+                        </Border>
+
+                        <ScrollBar x:Name="PART_VerticalScrollBar"
+                           Value="{TemplateBinding VerticalOffset}"
+                           Maximum="{TemplateBinding ScrollableHeight}"
+                           ViewportSize="{TemplateBinding ViewportHeight}"
+                           Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                           Grid.Row="1"
+                           Grid.Column="2" />
+                        <ScrollBar x:Name="PART_HorizontalScrollBar"
+                           Orientation="Horizontal"
+                           Grid.Row="2"
+                           Grid.Column="0"
+                           Value="{TemplateBinding HorizontalOffset}"
+                           Maximum="{TemplateBinding ScrollableWidth}"
+                           ViewportSize="{TemplateBinding ViewportWidth}"
+                           Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"/>
+                        <ContentPresenter ContentSource="Header" Grid.Row="0" Grid.ColumnSpan="2" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style TargetType="{x:Type s:DesignerCanvas}">        
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:DesignerCanvas}">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <Border.Resources>
+                            <s:DesignerTransformConverter x:Key="DesignerTransformConverter" />
+                        </Border.Resources>
+                            <Grid>
+                            <Grid.RowDefinitions>                                
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>                                
+                            <s:DesignerScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False" Name="PART_ScrollViewer"
+                                 KeyboardNavigation.IsTabStop="False" KeyboardNavigation.TabNavigation="None" 
+                                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                                 ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                 >
+                                <s:DesignerScrollViewer.Header>
+                                    <Border BorderBrush="Black" BorderThickness="1" Background="#8B000000">
+                                        <ContentControl Foreground="White" Margin="0" Padding="5,0,5,0"
+                                Content="{Binding Path=Header, RelativeSource={RelativeSource AncestorType={x:Type s:DesignerCanvas}}}" />
+                                    </Border>
+                                </s:DesignerScrollViewer.Header>
+                                <Grid Background="{TemplateBinding Background}" x:Name="Part_Grid" LayoutTransform="{TemplateBinding Zoom, Converter={StaticResource DesignerTransformConverter}}">                                      
+                                    <Grid.Resources>
+                                        <s:BooleanToVisibilityConverter x:Key="VisibillityConverter" />
+                                    </Grid.Resources>
+                                    <Canvas Name="Part_Connections" Focusable="False" KeyboardNavigation.TabNavigation="None"
+                                        KeyboardNavigation.IsTabStop="False" Visibility="{Binding Path=ShowConnections,Converter={StaticResource VisibillityConverter}, RelativeSource={RelativeSource AncestorType={x:Type s:DesignerCanvas}}}" 
+                                            Grid.Row="1"
+                                            />
+                                    <s:DesignerConnectionPresenter Data=" M 0 10 L 5 5 L 0 0" Grid.Row="1" />
+                                    <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"
+                                         x:Name="Items" Grid.Row="1"  />
+                                </Grid>
+                            </s:DesignerScrollViewer>                            
+                            <Border Grid.Row="2" x:Name="Container">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="0" >
+                                        <TextBox Width="300" x:Name="Part_Search" Margin="2,2,2,2">
+                                            <TextBox.InputBindings>
+                                                <KeyBinding Command="{x:Static s:DesignerCanvasCommands.Search}" Key="Enter"/>
+                                            </TextBox.InputBindings>
+                                        </TextBox>
+                                        <CheckBox Content="Case Sensitive" x:Name="Part_SearchCaseSensitive"
+                                                  VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
+                                        <Button Content="Decrease" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
+                                            Command="{x:Static s:DesignerCanvasCommands.DecreaseZoom}"/>
+                                        <Slider Width="{Binding ElementName=Container,Path=ActualWidth}"  MaxWidth="300" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Zoom, Mode=TwoWay}" Minimum="0.1" Maximum="1.0"
+                                        HorizontalAlignment="Right"/>                                        
+                                        <Button Content="Increase" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
+                                            Command="{x:Static s:DesignerCanvasCommands.IncreaseZoom}"/>
+                                        <Button Content="C" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
+                                            Command="{x:Static s:DesignerCanvasCommands.ToggleConnections}"/>
+                                        <Button Content="G" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
+                                            Command="{x:Static s:DesignerCanvasCommands.ToggleGridLines}"/>
+                                    </StackPanel>
+                                </Grid>                                
+                            </Border>
+                        </Grid>                        
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ShowGrid" Value="false" >
+                            <Trigger.Setters>
+                                <Setter TargetName="Part_Grid" Property="Background" Value="White" />
+                            </Trigger.Setters>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="ItemsControl.ItemsPanel" >
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <s:ResizeableCanvas x:Name="Part_Canvas" IsItemsHost="True" Focusable="False"/>
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+
+
+        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Background" Value="{StaticResource CanvasCell}" />
+
+
+
+        <!--
+        
+        ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                ScrollViewer.CanContentScroll="True" 
+        -->
+
+
+        <!--
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <s:ResizeableCanvas x:Name="Part_Canvas" IsItemsHost="True"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        -->
+
+    </Style>
+
+    <ControlTemplate x:Key="MoveThumbTemplate" TargetType="{x:Type s:MoveThumb}">
+        <Rectangle Fill="Transparent"/>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type s:MoveThumb}">
+        <Setter Property="Template" >
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:MoveThumb}">
+                    <Border Background="Transparent" CornerRadius="10">
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type s:Connector}">
+        <Setter Property="Width" Value="8"/>
+        <Setter Property="Height" Value="8"/>
+        <Setter Property="Cursor" Value="Cross"/>
+        <Setter Property="SnapsToDevicePixels" Value="true"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:Connector}">
+                    <Grid>
+                        <!-- transparent extra space makes connector easier to hit -->
+                        <Rectangle Fill="Transparent" Margin="-2"/>
+                        <Rectangle Fill="Lavender" StrokeThickness="1" Stroke="#AA000080"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
+    <Style TargetType="{x:Type s:DesignerConnection}">
+        <Setter Property="Template" >
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:DesignerConnection}">
+                    <Canvas DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=.}">
+                        <Canvas.Resources>
+                            <s:DesignerTransformConverter2 x:Key="DesignerTransformConverter" />                           
+                        </Canvas.Resources>
+
+                        <!--
+                        <Path Name="PART_ConnectionPath"
+                                                          StrokeThickness="1.2"
+                                                          Stroke="Black"
+                                                          StrokeStartLineCap="Round"
+                                                          StrokeEndLineCap="Round"
+                                                          StrokeLineJoin="Round" 
+                                                          StrokeDashArray="1.4"
+                                                          SnapsToDevicePixels="True"
+                                                          Data="{Binding Path=PathGeometry}"/>
+                        <Path x:Name="Arrow1" Stretch="Fill" StrokeLineJoin="Miter" Width="10" Height="10"
+                              Data="M 0 10 L 5 5 L 0 0" Stroke="Black" StrokeThickness="1"                                                          
+                              RenderTransformOrigin="0.5,0.5"
+                              RenderTransform="{Binding Path=PathGeometry, Converter={StaticResource DesignerTransformConverter}}"
+                        />  
+                        -->
+                    </Canvas>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <s:BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+
+    <Style TargetType="{x:Type s:DesignerComment}">
+        <Setter Property="SnapsToDevicePixels" Value="true"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:DesignerComment}">
+                    <Grid>
+                        <s:MoveThumb DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=.}" 
+                            Cursor="SizeAll" Focusable="True">
+                            <s:MoveThumb.Template>
+                                <ControlTemplate>
+                                    <Border Background="Bisque" CornerRadius="10">
+                                    </Border>
+                                </ControlTemplate>
+                            </s:MoveThumb.Template>
+                        </s:MoveThumb>
+                        <s:EditableTextBlock Margin="10,2"  x:Name="Part_Comment" Text="Comment" FontSize="20"/>
+                        <Rectangle Name="Part_SelectionRect" StrokeDashArray="0.5 1.0 0.3" Stroke="Black" StrokeThickness="1" RadiusX="10" RadiusY="10" Margin="0.9" 
+                            Visibility="{TemplateBinding IsSelected, Converter={StaticResource BooleanToVisibility}}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
+    <Style TargetType="{x:Type s:DesignerItem}">
+        <Setter Property="Template" >
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type s:DesignerItem}">
+                    <Grid Focusable="True">
+                        <Border BorderThickness="1" BorderBrush="Black" CornerRadius="10" Focusable="True" Background="{TemplateBinding Background}">
+                            <Grid Focusable="True">
+                                <Rectangle Name="Part_SelectionRect" StrokeDashArray="0.5 1.0 0.3" Stroke="Black" StrokeThickness="1" RadiusX="10" RadiusY="10" Margin="0.9" 
+                        Visibility="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type s:DesignerItem}}, Converter={StaticResource BooleanToVisibility}}" />
+                                <s:MoveThumb DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=.}" 
+                                 Cursor="SizeAll" Template="{StaticResource MoveThumbTemplate}" Focusable="True" />
+                                <ContentPresenter x:Name="Part_Content" Margin="10,3" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="MinWidth" Value="150" />
+        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush>
+                    <GradientStop Color="Gainsboro" Offset="0.0" />
+                    <GradientStop Color="White" Offset="1" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
+
+
+    <DataTemplate x:Key="InputConnectors">
+        <Grid>
+            <TextBlock Text="{Binding Name}" HorizontalAlignment="Left" />
+            <s:Connector x:Name="Part_Source" Normal="-30,0" Group="Sink"
+                                                 VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-10,1,10,-1" />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="OuputConnectors">
+        <Grid>
+            <TextBlock Text="{Binding Name}" HorizontalAlignment="Right" />
+            <s:Connector x:Name="Part_Out"  Normal="30,0" Group="Source"
+                                                 VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,1,-10,-1" />
+        </Grid>
+    </DataTemplate>
+    <Style TargetType="{x:Type s:EditableTextBlock}" x:Key="EditableTextBlockStyle">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=IsInEditMode, RelativeSource={RelativeSource Self}}" Value="true">
+                <Setter Property="MinHeight" Value="25" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="CommonConnectorsHost">
+        <Setter Property="ItemsControl.ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <StackPanel />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="InputConnectorsHost" BasedOn="{StaticResource CommonConnectorsHost}">
+        <Setter Property="ItemsControl.ItemTemplate" Value="{StaticResource InputConnectors}" />
+    </Style>
+    <Style x:Key="OutputConnectorsHost" BasedOn="{StaticResource CommonConnectorsHost}">
+        <Setter Property="ItemsControl.ItemTemplate" Value="{StaticResource OuputConnectors}" />
+    </Style>
+
+</ResourceDictionary>
