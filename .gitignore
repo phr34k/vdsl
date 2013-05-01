@@ -20,3 +20,5 @@ Debug
 *.pdb
 *.exe
 *.user
+*.sdf
+*.old
