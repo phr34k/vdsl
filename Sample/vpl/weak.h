@@ -59,7 +59,7 @@ namespace aurora
 	{
 	public:
 		typedef WeakReferenceHandle<N, C> WeakReference;
-		enum { MaxEntries = 64 };
+		//enum { MaxEntries = 64 };
 
 		WeakReferenceManager();
 		~WeakReferenceManager(){}
@@ -75,6 +75,7 @@ namespace aurora
 	private:
 		WeakReferenceManager(const WeakReferenceManager&);
 		WeakReferenceManager& operator=(const WeakReferenceManager&);
+	public:
 
 		struct WeakReferenceEntry
 		{
@@ -91,7 +92,7 @@ namespace aurora
 		signed int		   m_activeEntryCount;		
 		unsigned int	   m_firstFreeEntry;
 		unsigned int	   m_maximumEntryCount;
-		WeakReferenceEntry m_entries[MaxEntries];
+		WeakReferenceEntry m_entries[0];
 	};
 
 
@@ -111,9 +112,9 @@ namespace aurora
 		, m_entry(0)
 	{}
 
-	template<int N, int C> WeakReferenceManager<N,C>::WeakReferenceManager()
+	template<int N, int C> WeakReferenceManager<N,C>::WeakReferenceManager() : m_maximumEntryCount(0)
 	{
-		Reset();
+				
 	}
 
 	template<int N, int C> void WeakReferenceManager<N,C>::Reset()
@@ -121,10 +122,10 @@ namespace aurora
 		m_activeEntryCount = 0;
 		m_firstFreeEntry = 0;
 
-		for (int i = 0; i < MaxEntries - 1; ++i)
+		for (int i = 0; i < m_maximumEntryCount - 1; ++i)
 			m_entries[i] = WeakReferenceEntry(i + 1);
-		m_entries[MaxEntries - 1] = WeakReferenceEntry();
-		m_entries[MaxEntries - 1].m_endOfList = true;
+		m_entries[m_maximumEntryCount - 1] = WeakReferenceEntry();
+		m_entries[m_maximumEntryCount - 1].m_endOfList = true;
 	}
 
 

@@ -46,6 +46,14 @@ template<typename T> T& method_setproperty(void* a, int offset)
 	return *static_cast<T*>(method_setpropertyaddr(a, offset));
 }
 
+template<typename T> T& method_readproperty(void* a, int offset)
+{
+	extern void* method_readpropertyaddr(void* a, int offset);
+	return *static_cast<T*>(method_readpropertyaddr(a, offset));
+}
+
+
+
 typedef void (__cdecl *method_signature)(void* a, int signal);
 typedef void (__cdecl *method_releasetokensig)(void* a, unsigned int token);
 

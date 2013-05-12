@@ -103,7 +103,9 @@ namespace Aurora.SandboxDesigner.Controls
     {
         #region Private Members
 
+        private List<GraphIType> preset = null;
         private string value = string.Empty;
+        public object type = null;
 
         #endregion
 
@@ -125,15 +127,34 @@ namespace Aurora.SandboxDesigner.Controls
                 }
             }
         }
-        public object Type { get; set; }
+        public object Type { get { return type; } 
+            set { 
+                if (type != value) 
+                {    
+                    type = value; 
+                    change(); 
+                } } }
+        public List<GraphIType> Types { get { return preset; } set { preset = value; } }
 
         #endregion        
+
+        public event EventHandler OnChange;
+
+        public void change()
+        {
+            EventHandler hs = OnChange;
+            OnChange = null;
+            if (hs != null)
+                hs.Invoke(this, EventArgs.Empty);            
+        }
 
         #region ICloneable<GraphProperty> Members
 
         public GraphProperty Clone()
         {
-            return new GraphProperty(Owner, Name, Value, Type);
+            var x = new GraphProperty(Owner, Name, Value, Type);
+            x.preset = preset;
+            return x;
         }
 
         #endregion
@@ -154,7 +175,7 @@ namespace Aurora.SandboxDesigner.Controls
             this.Owner = Owner;
             this.Name = Name;
             this.Value = Value;
-            this.Type = Type;
+            this.type = Type;
         }
 
         #endregion
@@ -314,7 +335,7 @@ namespace Aurora.SandboxDesigner.Controls
         #endregion
     }
 
-    interface GraphIType
+    public interface GraphIType
     {
         string Name { get; set; }
         string Editor { get; set; }
@@ -379,6 +400,18 @@ namespace Aurora.SandboxDesigner.Controls
             set { InsertPosition = value; }
         }        
     };
+
+
+    public class GraphNodeDiagramDesignerCommands
+    {
+        private static RoutedCommand SelectTypeCommand = new RoutedCommand("SelectType",
+            typeof(DesignerCanvas));
+
+        public static RoutedCommand SelectType
+        {
+            get { return GraphNodeDiagramDesignerCommands.SelectTypeCommand; }
+        }
+    }
 
     public class GraphNodeDiagramDesigner : DesignerCanvas
     {
@@ -552,11 +585,7 @@ namespace Aurora.SandboxDesigner.Controls
 
 
        
-        public GraphNodeDiagramDesigner()
-        {
-            Reload();
-            this.ConnectionCanLink += new LinkCanEstablishEventHandler(GraphNodeDiagramDesigner_ConnectionCanLink);
-        }
+
 
         private void Reload()
         {
@@ -859,14 +888,26 @@ namespace Aurora.SandboxDesigner.Controls
                                 string value = reader.GetAttribute("Default");
                                 string type = reader.GetAttribute("Type");
                                 string visible = reader.GetAttribute("Visible");
+                                string[] types = (reader.GetAttribute("Types") == null ? string.Empty : reader.GetAttribute("Types")).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                
 
 
                                 if (string.IsNullOrEmpty(visible) && visible != "Hidden")
                                 {
                                     object typeInformation = null;
                                     if (!string.IsNullOrEmpty(type)) designerDatabase.Types.TryGetValue(type, out typeInformation);
-                                    item.properties.Add(new GraphProperty(item, name, value, typeInformation));
-                                }
+                                    GraphProperty p = new GraphProperty(item, name, value, typeInformation);                                    
+                                    if (types.Length > 0)
+                                    {
+                                        p.Types = new List<GraphIType>();
+                                        foreach (string x in types)
+                                            p.Types.Add(designerDatabase.Types[x] as GraphIType);
+                                    }
+                                    
+                                    item.properties.Add(p);
+
+                                    
+                                }                                
                             }
                             else if (enumType != null)
                             {
@@ -928,6 +969,7 @@ namespace Aurora.SandboxDesigner.Controls
         {
             try
             {
+                GraphNodeItem item = null;
                 List<DesignerConnection> mconnections = new List<DesignerConnection>();
 
                 _loading = true;
@@ -975,7 +1017,7 @@ namespace Aurora.SandboxDesigner.Controls
                             string id = reader.GetAttribute("Id");
                             if (uint.TryParse(id, System.Globalization.NumberStyles.HexNumber, null, out v))
                             {
-                                GraphNodeItem item = new GraphNodeItem(v) { Name = reader.GetAttribute("Designer.Name"), Typename = reader.GetAttribute("Type") };
+                                item = new GraphNodeItem(v) { Name = reader.GetAttribute("Designer.Name"), Typename = reader.GetAttribute("Type") };
                                 GraphNodeItem template = null;
 
                                 string type = reader.GetAttribute("Type");
@@ -1001,15 +1043,34 @@ namespace Aurora.SandboxDesigner.Controls
                                 }
 
                                 nodeResolver[item.NodeId] = item;
-                                Items.Add(item);
-
+                                
                                 if (string.IsNullOrEmpty(reader.GetAttribute("Designer.OffsetX")) == false)
                                     canvasLeftLookup[item] = double.Parse(reader.GetAttribute("Designer.OffsetX"), System.Globalization.CultureInfo.InvariantCulture);
                                 if (string.IsNullOrEmpty(reader.GetAttribute("Designer.OffsetY")) == false)
                                     canvasTopLookup[item] = double.Parse(reader.GetAttribute("Designer.OffsetY"), System.Globalization.CultureInfo.InvariantCulture);
                             }
 
-                            reader.Skip();
+                            //reader.Skip();
+                            if (reader.IsEmptyElement)
+                            {
+                                Items.Add(item);
+                                item = null;
+                            }
+                        }
+                        else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Property")
+                        {
+                            GraphProperty property = item.properties.Where(x => x.Name == reader.GetAttribute("Name")).FirstOrDefault();
+                            if (property != null && property.Types != null)
+                            {
+                                string name = reader.GetAttribute("Type");
+                                var type = property.Types.Where(x => x.Name == name).FirstOrDefault();
+                                if (type != null) property.Type = type;                                
+                            }                            
+                        }
+                        else if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "Node")
+                        {                            
+                            Items.Add(item);
+                            item = null;
                         }
                         else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Connection")
                         {
@@ -1169,8 +1230,18 @@ namespace Aurora.SandboxDesigner.Controls
 
 
                     writer.WriteAttributeString("Designer.OffsetX", ResizeableCanvas.GetLeft(designerItem).ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    writer.WriteAttributeString("Designer.OffsetY", ResizeableCanvas.GetTop(designerItem).ToString(System.Globalization.CultureInfo.InvariantCulture));                    
+                    writer.WriteAttributeString("Designer.OffsetY", ResizeableCanvas.GetTop(designerItem).ToString(System.Globalization.CultureInfo.InvariantCulture));
 
+                    foreach (GraphProperty prop in item.properties)
+                    {
+                        if (prop.Type != null )
+                        {
+                            writer.WriteStartElement("Property");
+                            writer.WriteAttributeString("Name", prop.Name );
+                            writer.WriteAttributeString("Type", (prop.Type as GraphIType).Name);
+                            writer.WriteEndElement();
+                        }
+                    }                    
 
                     writer.WriteEndElement();                                      
                 }
@@ -1303,6 +1374,28 @@ namespace Aurora.SandboxDesigner.Controls
 
             #endregion
         }
+
+        public GraphNodeDiagramDesigner()
+        {
+            Reload();
+            this.ConnectionCanLink += new LinkCanEstablishEventHandler(GraphNodeDiagramDesigner_ConnectionCanLink);            
+        }
+
+        static GraphNodeDiagramDesigner()
+        {
+            CommandManager.RegisterClassCommandBinding(typeof(GraphNodeDiagramDesigner), new CommandBinding(GraphNodeDiagramDesignerCommands.SelectType, CommandSelectTypeHandler));
+        }
+
+        private static void CommandSelectTypeHandler(object target, ExecutedRoutedEventArgs e)
+        {
+            GraphNodeDiagramDesigner canvas = (target as GraphNodeDiagramDesigner);
+            if (e.Command == GraphNodeDiagramDesignerCommands.SelectType)
+            {
+                BooleanField f = e.OriginalSource as BooleanField;
+                (f.DataContext as GraphProperty).change();                
+            }
+        }
+     
     }
 
     
@@ -1363,9 +1456,50 @@ namespace Aurora.SandboxDesigner.Controls
         {
             DesignerCanvas canvas = (FindAnchestor<DesignerCanvas>(container) as DesignerCanvas);
             GraphProperty property = item as GraphProperty;
+
+            if (property != null)
+            {
+                property.OnChange += delegate(object x, EventArgs x2)
+                {
+                    GraphProperty propertyx = property;
+                    var z = propertyx.Type;
+                    ContentPresenter presenter = container as ContentPresenter;
+                    object c = presenter.GetValue(ContentPresenter.ContentProperty);
+                    //presenter.SetValue(ContentPresenter.ContentTemplateSelectorProperty, null);
+                    //presenter.SetValue(ContentPresenter.ContentTemplateSelectorProperty, c);
+                    
+                    System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvoke((Action)delegate()
+                    {
+                        System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvoke((Action)delegate()
+                        {
+                            property.OnChange += delegate(object x3, EventArgs x4)
+                            {
+                                if (property.Type == null)
+                                {
+                                    presenter.SetValue(ContentPresenter.ContentProperty, c);
+                                    propertyx.type = z;
+                                }
+                            };
+
+                            presenter.SetValue(ContentPresenter.ContentProperty, null);
+                        }, System.Windows.Threading.DispatcherPriority.Normal, new object[] { });                                              
+                    }, System.Windows.Threading.DispatcherPriority.Normal, new object[] { });
+
+
+                    
+
+
+
+
+                    
+
+
+                };
+            }
+
             if (property != null && property.Type != null)
             {
-                if (property.Type is GraphIType && !String.IsNullOrEmpty((property.Type as GraphIType).Editor))
+                 if (property.Type is GraphIType && !String.IsNullOrEmpty((property.Type as GraphIType).Editor))
                 {
                     var s = canvas.Resources[(property.Type as GraphIType).Editor]
                         as DataTemplate;
@@ -1377,8 +1511,11 @@ namespace Aurora.SandboxDesigner.Controls
             //return canvas.Resources["MyParam"] as DataTemplate;   
             //var v = (container as FrameworkElement).Resources[typeof(GraphProperty)];
             //return v as DataTemplate;
+
+
             return null;             
         }
+
 
         // Helper to search up the VisualTree
         private static T FindAnchestor<T>(DependencyObject current)
@@ -1433,6 +1570,31 @@ namespace Aurora.SandboxDesigner.Controls
         {            
             IEnumerable<GraphSocket> v = value as IEnumerable<GraphSocket>;
             return v.Skip(Convert.ToInt32(parameter)).FirstOrDefault();
+        }
+
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    };
+
+    public class GraphTypesVisibillitySelector : IValueConverter
+    {
+
+        #region IValueConverter Members
+
+        object IValueConverter.Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value == null)
+            {
+                return Visibility.Collapsed;
+            }
+            else
+            {
+                return Visibility.Visible;
+            }
         }
 
         object IValueConverter.ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

@@ -107,6 +107,13 @@
                     </DataTemplate>
 
 
+                    <DataTemplate x:Key="MyParam9">
+                        <StackPanel>
+                            <s:BooleanField Text="{Binding Value, Mode=TwoWay}" Tag="{Binding Name, Mode=TwoWay}" />                                                   
+                        </StackPanel>
+                    </DataTemplate>
+
+
 
 
                     <Style x:Key="DefaultStyle" TargetType="{x:Type s:DesignerItem}">

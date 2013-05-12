@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <Flow>
-
+  
+  <Type Name="int2" Editor="MyParam9"/>
   <Type Name="int" Editor="MyParam6"/>
   <Type Name="float" Editor="MyParam6"/>
   <Type Name="quaternion" Editor="MyParam5"/>
@@ -202,7 +203,7 @@
     <Member Name="Z" Value="90" />
     <Member Name="Zoom" Value="0xfb" />
   </Enum>
-
+  
   <Node Name="Comment" Color="Red" Category="Misc">
     <!-- Special node -->
   </Node>
@@ -581,6 +582,13 @@
     <Signal Name="Out" Type="Out"  />
   </Node>
 
+  <Node Name="GFXGetVariable2" Color="LimeGreen" Category="Experimental">
+    <Member Name="Movie" Default="0" Type="int"/>
+    <Member Name="Variable" Default="" />
+    <Member Name="Value" Default="0" Type="int" Types="float,int,bool" />
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out" Type="Out"  />
+  </Node>
 
 
 </Flow>

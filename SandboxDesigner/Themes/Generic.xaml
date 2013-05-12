@@ -100,9 +100,15 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type s:TextField}">
+                            <ControlTemplate.Resources>
+                                <s:GraphTypesVisibillitySelector x:Key="GraphTypesVisibillitySelector" />
+                            </ControlTemplate.Resources>
                             <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" FocusManager.IsFocusScope="True">
-                                <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" 
+                                <StackPanel>
+                                    <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" 
                                          MinWidth="130"/>
+                                    <ComboBox DisplayMemberPath="Name" SelectedItem="{Binding Path=Type, Mode=TwoWay}" ItemsSource="{Binding Types, Mode=OneWay}" Visibility="{Binding Path=Types, Converter={StaticResource GraphTypesVisibillitySelector}}" />
+                                </StackPanel>
                             </Border>
                         </ControlTemplate>
                     </Setter.Value>
@@ -142,12 +148,16 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type s:Vector4}">
+                            <ControlTemplate.Resources>
+                                <s:GraphTypesVisibillitySelector x:Key="GraphTypesVisibillitySelector" />
+                            </ControlTemplate.Resources>
                             <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                                 <StackPanel Background="{TemplateBinding Background}" FocusManager.IsFocusScope="True">
                                     <TextBox Text="{Binding ComponentX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
                                     <TextBox Text="{Binding ComponentY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
                                     <TextBox Text="{Binding ComponentZ, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
                                     <TextBox Text="{Binding ComponentW, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <ComboBox DisplayMemberPath="Name" SelectedItem="{Binding Path=Type, Mode=TwoWay}" ItemsSource="{Binding Types, Mode=OneWay}" Visibility="{Binding Path=Types, Converter={StaticResource GraphTypesVisibillitySelector}}" />
                                 </StackPanel>
                             </Border>
                         </ControlTemplate>
@@ -189,11 +199,15 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type s:Vector3}">
+                            <ControlTemplate.Resources>
+                                <s:GraphTypesVisibillitySelector x:Key="GraphTypesVisibillitySelector" />
+                            </ControlTemplate.Resources>
                             <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                                 <StackPanel Background="{TemplateBinding Background}" FocusManager.IsFocusScope="True">
                                     <TextBox Text="{Binding ComponentX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
                                     <TextBox Text="{Binding ComponentY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
                                     <TextBox Text="{Binding ComponentZ, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <ComboBox DisplayMemberPath="Name" SelectedItem="{Binding Path=Type, Mode=TwoWay}" ItemsSource="{Binding Types, Mode=OneWay}" Visibility="{Binding Path=Types, Converter={StaticResource GraphTypesVisibillitySelector}}" />
                                 </StackPanel>
                             </Border>
                         </ControlTemplate>
@@ -233,10 +247,14 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type s:Vector2}">
+                            <ControlTemplate.Resources>
+                                <s:GraphTypesVisibillitySelector x:Key="GraphTypesVisibillitySelector" />
+                            </ControlTemplate.Resources>
                             <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                                 <StackPanel Background="{TemplateBinding Background}" FocusManager.IsFocusScope="True">
                                     <TextBox Text="{Binding ComponentX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
                                     <TextBox Text="{Binding ComponentY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <ComboBox DisplayMemberPath="Name" SelectedItem="{Binding Path=Type, Mode=TwoWay}" ItemsSource="{Binding Types, Mode=OneWay}" Visibility="{Binding Path=Types, Converter={StaticResource GraphTypesVisibillitySelector}}" />
                                 </StackPanel>
                             </Border>
                         </ControlTemplate>
@@ -276,9 +294,13 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type s:Vector1}">
+                            <ControlTemplate.Resources>
+                                <s:GraphTypesVisibillitySelector x:Key="GraphTypesVisibillitySelector" />
+                            </ControlTemplate.Resources>                            
                             <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                                 <StackPanel Background="{TemplateBinding Background}" FocusManager.IsFocusScope="True">
                                     <TextBox Text="{Binding ComponentX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <ComboBox DisplayMemberPath="Name" SelectedItem="{Binding Path=Type, Mode=TwoWay}" ItemsSource="{Binding Types, Mode=OneWay}" Visibility="{Binding Path=Types, Converter={StaticResource GraphTypesVisibillitySelector}}" />
                                 </StackPanel>
                             </Border>
                         </ControlTemplate>
@@ -319,11 +341,15 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type s:EnumField}">
+                            <ControlTemplate.Resources>
+                                <s:GraphTypesVisibillitySelector x:Key="GraphTypesVisibillitySelector" />
+                            </ControlTemplate.Resources>
                             <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                                 <StackPanel Background="{TemplateBinding Background}" FocusManager.IsFocusScope="True">
                                     <ComboBox DisplayMemberPath="Key"  Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                               
                                               ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                    <ComboBox DisplayMemberPath="Name" SelectedItem="{Binding Path=Type, Mode=TwoWay}" ItemsSource="{Binding Types, Mode=OneWay}" Visibility="{Binding Path=Types, Converter={StaticResource GraphTypesVisibillitySelector}}" />
                                 </StackPanel>
                             </Border>
                         </ControlTemplate>
@@ -340,6 +366,7 @@
                 <ControlTemplate TargetType="{x:Type s:BooleanField}">
                     <ControlTemplate.Resources>
                         <s:BooleanFieldDisplayConverter x:Key="BooleanFieldDisplayConverter" />                       
+                        <s:GraphTypesVisibillitySelector x:Key="GraphTypesVisibillitySelector" />
                     </ControlTemplate.Resources>
                     <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                         <TextBlock Background="{TemplateBinding Background}" x:Name="Part_Content" >
@@ -367,10 +394,12 @@
                         <ControlTemplate TargetType="{x:Type s:BooleanField}">
                             <ControlTemplate.Resources>
                                 <s:BooleanFieldValueConverter x:Key="BooleanFieldValueConverter" />
+                                <s:GraphTypesVisibillitySelector x:Key="GraphTypesVisibillitySelector" />
                             </ControlTemplate.Resources>
                             <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                                 <StackPanel Background="{TemplateBinding Background}" FocusManager.IsFocusScope="True">
                                     <CheckBox IsChecked="{Binding Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanFieldValueConverter}}" />
+                                    <ComboBox DisplayMemberPath="Name" SelectedItem="{Binding Path=Type, Mode=TwoWay}" ItemsSource="{Binding Types, Mode=OneWay}" Visibility="{Binding Path=Types, Converter={StaticResource GraphTypesVisibillitySelector}}" />
                                 </StackPanel>
                             </Border>
                         </ControlTemplate>

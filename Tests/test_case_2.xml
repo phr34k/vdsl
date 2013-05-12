@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Flow>
+  <Node
+    Id="1A620A72"
+    Type="GFXGetVariable2"
+    Designer.Name="1a620a72"
+    Movie="0"
+    Value="0"
+    Designer.OffsetX="444"
+    Designer.OffsetY="82.04">
+    <Property
+      Name="Movie"
+      Type="int" />
+    <Property
+      Name="Value"
+      Type="int" />
+  </Node>
+  <Node
+    Id="1A2EABBF"
+    Type="Signal"
+    Designer.Name="Execute"
+    Designer.OffsetX="175"
+    Designer.OffsetY="174.04" />
+  <Node
+    Id="1A2D20E7"
+    Type="AddInt32"
+    Designer.Name="1a2d20e7"
+    A="0"
+    B="19"
+    C="0"
+    Designer.OffsetX="740"
+    Designer.OffsetY="82.04">
+    <Property
+      Name="A"
+      Type="int" />
+    <Property
+      Name="B"
+      Type="int" />
+    <Property
+      Name="C"
+      Type="int" />
+  </Node>
+  <Node
+    Id="1AE4B071"
+    Type="GFXGetVariable2"
+    Designer.Name="1ae4b071"
+    Movie="0"
+    Value="0"
+    Designer.OffsetX="445"
+    Designer.OffsetY="203.04">
+    <Property
+      Name="Movie"
+      Type="int" />
+    <Property
+      Name="Value"
+      Type="float" />
+  </Node>
+  <Node
+    Id="1BB390C2"
+    Type="AddFloat"
+    Designer.Name="1bb390c2"
+    A="0"
+    B="7.2"
+    C="0"
+    Designer.OffsetX="738"
+    Designer.OffsetY="203.04">
+    <Property
+      Name="A"
+      Type="float" />
+    <Property
+      Name="B"
+      Type="float" />
+    <Property
+      Name="C"
+      Type="float" />
+  </Node>
+  <Connection
+    Source="1A620A72.In"
+    Target="1A2EABBF.Out"
+    Type="Element" />
+  <Connection
+    Source="1A2D20E7.A"
+    Target="1A620A72.Value"
+    SourceType="In"
+    TargetType="Out"
+    Type="Property" />
+  <Connection
+    Source="1A2D20E7.In"
+    Target="1A620A72.Out"
+    Type="Element" />
+  <Connection
+    Source="1AE4B071.In"
+    Target="1A2EABBF.Out"
+    Type="Element" />
+  <Connection
+    Source="1BB390C2.In"
+    Target="1AE4B071.Out"
+    Type="Element" />
+  <Connection
+    Source="1BB390C2.A"
+    Target="1AE4B071.Value"
+    SourceType="In"
+    TargetType="Out"
+    Type="Property" />
+</Flow>

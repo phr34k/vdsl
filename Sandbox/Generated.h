@@ -1142,5 +1142,28 @@ namespace flow {
 		};
 	};
 
+	struct GFXGetVariable2
+	{
+	
+		enum
+		{
+			SymbolId = 0x0032
+		};
+	
+		struct Internal;
+		friend Internal;
+	
+		struct Properties
+		{
+			enum
+			{
+				Movie,
+				Variable,
+				Value,
+				Max,
+			};
+		};
+	};
+
 
 }

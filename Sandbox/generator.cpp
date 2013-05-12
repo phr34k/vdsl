@@ -83,6 +83,13 @@ void* method_setpropertyaddr(void* a, int offset)
 	return s + *r;	
 }
 
+void* method_readpropertyaddr(void* a, int offset)
+{
+	char* s = reinterpret_cast<char*>(a) - 4 - offset * 8;
+	int* r = (int*)s;
+	return (s + *r) - 4;	
+}
+
 char* method_getnodename(void* a)
 {
 	char* s = reinterpret_cast<char*>(a) + 4 + 4;
@@ -586,7 +593,6 @@ void* emitNodePrologue(bool preview,void* sequence, void* a, TiXmlElement* insta
 
 void emitPreNodeData(TiXmlElement* instanceInfo, TiXmlElement* typeInfo, unsigned int& tokenCount, std::map<std::string, void*>& stringInterning  )
 {
-	tokenCount = 0;
 	TiXmlElement* node = typeInfo->FirstChildElement();
 	for( ; node != 0; node = node->NextSiblingElement()) {
 		if( stricmp(node->Value(), "Member") == 0x0 /*&& stricmp(node->Attribute("Name"), "Out")*/ ) {							
@@ -604,8 +610,22 @@ void* emitNodeData(bool preview, void* sequence, void* a, TiXmlElement* instance
 	//Emit the data-member patch table..
 	TiXmlElement* node = typeInfo->FirstChildElement();
 	for( ; node != 0; node = node->NextSiblingElement()) {
-		if( stricmp(node->Value(), "Member") == 0x0 /*&& stricmp(node->Attribute("Name"), "Out")*/ ) {							
-			if( node->Attribute("Type") == 0x0 ) {
+		if( stricmp(node->Value(), "Member") == 0x0 /*&& stricmp(node->Attribute("Name"), "Out")*/ ) 
+		{					
+			const char* type = node->Attribute("Type");
+			const char* types = node->Attribute("Types");
+			bool isspecial = types != 0x0;					
+			if( isspecial )
+			{
+				TiXmlElement* xnode = instanceInfo->FirstChildElement();
+				for( ; xnode != 0; xnode = xnode->NextSiblingElement()) {
+					if( stricmp(xnode->Value(), "Property") == 0x0 && stricmp(xnode->Attribute("Name"), node->Attribute("Name")) == 0x0) {
+						type = xnode->Attribute("Type");
+					}
+				}
+			}
+
+			if( type == 0x0 ) {
 				
 				const char* v = instanceInfo->Attribute(node->Attribute("Name"));								
 				void* seq = stringInterning[std::string(v ? v : "")];
@@ -616,49 +636,57 @@ void* emitNodeData(bool preview, void* sequence, void* a, TiXmlElement* instance
 				referenceCounter[h.m_index] = 1;		
 				//sequence = emitCharLiteral(sequence, v ? v : "");				
 
-				
-				node->SetUserData(sequence);
+							
 				unsigned int weakRefAsValue = h;
+				if( isspecial ) sequence = emitInt32(preview, sequence, 0x000001);
+				node->SetUserData(sequence);
 				sequence = emitInt32(preview, sequence, weakRefAsValue);
 
-			} else if( stricmp(node->Attribute("Type"), "vector3") == 0x0 ) {
-				node->SetUserData(sequence);				
+			} else if( stricmp(type, "vector3") == 0x0 ) {								
 				const char* v = instanceInfo->Attribute(node->Attribute("Name"));				
 				float x, y, z; int d = sscanf( v, "%f %f %f", &x, &y, &z);
+				if( isspecial ) sequence = emitInt32(preview, sequence, 0x000002);
+				node->SetUserData(sequence);
 				sequence = emitFloat(preview, sequence, x);
 				sequence = emitFloat(preview, sequence, y);
 				sequence = emitFloat(preview, sequence, z);
-			} else if( stricmp(node->Attribute("Type"), "quaternion") == 0x0 ) {
-				node->SetUserData(sequence);				
+			} else if( stricmp(type, "quaternion") == 0x0 ) {								
 				const char* v = instanceInfo->Attribute(node->Attribute("Name"));				
 				float x, y, z, w; int d = sscanf( v, "%f %f %f %s", &x, &y, &z, &w);
+				if( isspecial ) sequence = emitInt32(preview, sequence, 0x000003);
+				node->SetUserData(sequence);
 				sequence = emitFloat(preview, sequence, x);
 				sequence = emitFloat(preview, sequence, y);
 				sequence = emitFloat(preview, sequence, z);
 				sequence = emitFloat(preview, sequence, w);
-			} else if( stricmp(node->Attribute("Type"), "float") == 0x0 ) {
-				node->SetUserData(sequence);
+			} else if( stricmp(type, "float") == 0x0 ) {				
 				const char* v = instanceInfo->Attribute(node->Attribute("Name"));
+				if( isspecial ) sequence = emitInt32(preview, sequence, 0x000004);
+				node->SetUserData(sequence);
 				sequence = emitFloat(preview, sequence, atof(v ? v : "0"));
-			} else if( stricmp(node->Attribute("Type"), "int") == 0x0 ) {
-				node->SetUserData(sequence);
+			} else if( stricmp(type, "int") == 0x0 ) {				
 				const char* v = instanceInfo->Attribute(node->Attribute("Name"));
-				sequence = emitInt32(preview, sequence, atoi(v ? v : "0"));
-			} else if( stricmp(node->Attribute("Type"), "bool") == 0x0 ) {
+				if( isspecial ) sequence = emitInt32(preview, sequence, 0x000005);
 				node->SetUserData(sequence);
+				sequence = emitInt32(preview, sequence, atoi(v ? v : "0"));
+			} else if( stricmp(type, "bool") == 0x0 ) {				
 				const char* v = instanceInfo->Attribute(node->Attribute("Name"));
-				sequence = emitInt32(preview, sequence, atoi(v ? v : "0"));
-			} else if( stricmp(node->Attribute("Type"), "signal") == 0x0 ) {
+				if( isspecial ) sequence = emitInt32(preview, sequence, 0x000006);
 				node->SetUserData(sequence);
+				sequence = emitInt32(preview, sequence, atoi(v ? v : "0"));
+			} else if( stricmp(type, "signal") == 0x0 ) {
+				
 				const char* name = instanceInfo->Attribute(node->Attribute("Name"));
-				void* node = 0, *f = a, *n = f;
+				void* mnode = 0, *f = a, *n = f;
 				do {
 					char* member = method_getnodename(f);		
-					if( member != 0 && stricmp(member, name) == 0 ) node = f;
+					if( member != 0 && stricmp(member, name) == 0 ) mnode = f;
 				} while( n != (f = method_next(f)) );
-				if( node != 0 ) 
+				if( mnode != 0 ) 
 				{
-					sequence = emitRelative(preview, sequence, node);
+					if( isspecial ) sequence = emitInt32(preview, sequence, 0x000007);
+					node->SetUserData(sequence);
+					sequence = emitRelative(preview, sequence, mnode);
 				} 
 				else 
 				{														
@@ -669,12 +697,16 @@ void* emitNodeData(bool preview, void* sequence, void* a, TiXmlElement* instance
 					if( itt == node_mappings2.end() ) 
 					{
 						printf("Signal missing %s on node (%s:%s)\r\n", name, instanceInfo->Attribute("Id"), instanceInfo->Attribute("Name"));
+						if( isspecial ) sequence = emitInt32(preview, sequence, 0x000007);
+						node->SetUserData(sequence);
 						sequence = emitRelative(preview, sequence, sequence);
 					}
 					else 
 					{						
-						node = itt->second->GetUserData();
-						sequence = emitRelative(preview, sequence, node);
+						mnode = itt->second->GetUserData();
+						if( isspecial ) sequence = emitInt32(preview, sequence, 0x000007);
+						node->SetUserData(sequence);
+						sequence = emitRelative(preview, sequence, mnode);
 					}
 				}		
 			} else {
@@ -682,20 +714,22 @@ void* emitNodeData(bool preview, void* sequence, void* a, TiXmlElement* instance
 				const char* v = instanceInfo->Attribute(node->Attribute("Name"));				
 				TiXmlElement* xnode = typeInfo->Parent()->FirstChildElement();
 				for( ; xnode != 0; xnode = xnode->NextSiblingElement()) {
-					if( stricmp( xnode->Value(), "Enum" ) == 0x0 && stricmp(xnode->Attribute("Name"),node->Attribute("Type")) == 0x0 ) {
+					if( stricmp( xnode->Value(), "Enum" ) == 0x0 && stricmp(xnode->Attribute("Name"),type) == 0x0 ) {
 						TiXmlElement* enode = xnode->FirstChildElement();
 						for( ; enode != 0; enode = enode->NextSiblingElement()) {				
 							if( strcmp(enode->Attribute("Name"), v) == 0x0 ) 
 							{
 								unsigned int value;
 								if( sscanf(enode->Attribute("Value"), "0x%X", &value) == 0 )
-								{
-									node->SetUserData(sequence);								
+								{									
+									if( isspecial ) sequence = emitInt32(preview, sequence, 0x000008);
+									node->SetUserData(sequence);
 									sequence = emitInt32(preview, sequence, atoi(enode->Attribute("Value")));
 								}
 								else
-								{
-									node->SetUserData(sequence);								
+								{																	
+									if( isspecial ) sequence = emitInt32(preview, sequence, 0x000008);
+									node->SetUserData(sequence);
 									sequence = emitInt32(preview, sequence, value);
 								}								
 							}
@@ -1292,7 +1326,9 @@ void* parse(const char* metaformat, const char* filename, int& outputSize)
 		std::map<unsigned int, TiXmlElement*> node_mappings;
 		std::map<unsigned int, TiXmlElement*> node_mappings2;		
 		std::map<std::string, void*>		  stringInterning;
-		unsigned int tokenCount = 0; 
+
+		//Always construct one extra token.
+		unsigned int tokenCount = 1; 
 
 		
 
@@ -1378,14 +1414,29 @@ void* parse(const char* metaformat, const char* filename, int& outputSize)
 			}
 		}
 		
+		//Allocate the token storage reference counter
 		countedReferenceTable = sequence;
 		unsigned int* referenceCounter = (unsigned int*)sequence;
-		sequence = (char*)sequence + sizeof(unsigned int) * aurora::WeakReferenceManager<12, 15>::MaxEntries;
+		sequence = (char*)sequence + sizeof(unsigned int) * tokenCount;
 		
+		//Allocate the token storage.
 		aurora::WeakReferenceManager<12, 15>* w = new (sequence) aurora::WeakReferenceManager<12, 15>(); sequence = w;	
+		w->m_maximumEntryCount = tokenCount;
 		weakReferenceTable = sequence;
-		sequence = (char*)sequence + sizeof(aurora::WeakReferenceManager<12, 15>);
+
+		//Move the sequence to the dynamic array allocation
+		sequence = (char*)sequence + 12;
+
+		//Allocate the entries for the tokens.
+		for( int i = 0; i < tokenCount; i++ ) {
+			new( sequence ) aurora::WeakReferenceManager<12, 15>::WeakReferenceEntry();
+			sequence = (char*)sequence + sizeof(aurora::WeakReferenceManager<12, 15>::WeakReferenceEntry);
+			assert( ((char*)sequence - (char*)address) < maxSize );
+		}
+
+		//Initialize the token storage.
 		assert( ((char*)sequence - (char*)address) < maxSize );
+		w->Reset();
 
 
 		std::map<std::string, void*>::iterator itt;

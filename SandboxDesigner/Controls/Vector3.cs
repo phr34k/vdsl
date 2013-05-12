@@ -77,7 +77,8 @@ namespace Aurora.SandboxDesigner.Controls
                 string[] v = textBlock.Text.Split(new char[] { ' ' });
                 if (v.Length == 1)
                 {
-                    float a = float.Parse(v[0], System.Globalization.CultureInfo.InvariantCulture);
+                    float a = 0.0f;
+                    float.TryParse(v[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out a);
                     textBlock.componentx = a;
                     if (textBlock.PropertyChanged != null)
                         textBlock.PropertyChanged.Invoke(textBlock, new System.ComponentModel.PropertyChangedEventArgs("ComponentX"));
@@ -519,7 +520,8 @@ namespace Aurora.SandboxDesigner.Controls
 
         protected override void OnLostFocus(RoutedEventArgs e)
         {
-            GetBindingExpression(TextProperty).UpdateSource();           
+            if (GetBindingExpression(TextProperty) != null)
+                GetBindingExpression(TextProperty).UpdateSource();           
             base.OnLostFocus(e);
         }
 
@@ -582,7 +584,8 @@ namespace Aurora.SandboxDesigner.Controls
 
         protected override void OnLostFocus(RoutedEventArgs e)
         {
-            GetBindingExpression(TextProperty).UpdateSource();
+            if (GetBindingExpression(TextProperty) != null)
+                GetBindingExpression(TextProperty).UpdateSource();
             base.OnLostFocus(e);
         }
 
@@ -629,7 +632,8 @@ namespace Aurora.SandboxDesigner.Controls
 
         protected override void OnLostFocus(RoutedEventArgs e)
         {
-            GetBindingExpression(TextProperty).UpdateSource();
+            if(GetBindingExpression(TextProperty) != null)
+                GetBindingExpression(TextProperty).UpdateSource();
             base.OnLostFocus(e);
         }
 
@@ -656,7 +660,8 @@ namespace Aurora.SandboxDesigner.Controls
         {
             if (value is string)
             {
-                int a = int.Parse(value as string, System.Globalization.CultureInfo.InvariantCulture);
+                int a = 0;
+                int.TryParse(value as string, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out a);
                 if (a == 0) return "False";
                 return "True";
             }
@@ -680,7 +685,8 @@ namespace Aurora.SandboxDesigner.Controls
         {
             if (value is string)
             {
-                int a = int.Parse(value as string, System.Globalization.CultureInfo.InvariantCulture);
+                int a = 0;
+                int.TryParse(value as string, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out a);
                 if (a == 0) return false;
                 return true;
             }

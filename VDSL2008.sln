@@ -18,6 +18,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SandboxDesigner", "SandboxD
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Generator", "Generator\Generator.vcproj", "{1878CC09-C1B6-4E12-AAD7-D6BB4674BAE2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2F097702-0192-4A98-8BF0-E41F11380102}"
+	ProjectSection(SolutionItems) = preProject
+		flow.xml = flow.xml
+		Sample\test_case_2.xml = Sample\test_case_2.xml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -611,7 +611,28 @@ void __cdecl method_delay(void* a, int signal)
 	CloseHandle(hThread);		
 }
 
-
+void __cdecl method_getvariable(void* a, int signal)
+{
+	method_setproperty<int>(a, 0) = method_getproperty<int>(a, 0);
+		
+	
+	if( method_readproperty<int>(a, 2) == 5 /* Determines if the type was a integer */ )
+	{
+		method_setproperty<int>(a, 2) = method_getproperty<int>(a, 2);
+		method_setproperty<int>(a, 2) = 22;
+		method_raise(a, 0);
+	}
+	else if( method_readproperty<int>(a, 2) == 4 /* Determines if the type was a float */ )
+	{
+		method_setproperty<float>(a, 2) = method_getproperty<float>(a, 2);
+		method_setproperty<float>(a, 2) = 9.8;
+		method_raise(a, 0);
+	}	
+	else
+	{
+		method_raise(a, 0);
+	}
+}
 
 
 
@@ -663,6 +684,7 @@ void main(int argc, char** argv)
 	functionMapping[Delay::SymbolId] = &method_delay;
 	functionMapping[Assert::SymbolId] = &method_assert;
 	functionMapping[Concatenate::SymbolId] = &method_assert2;	
+	functionMapping[GFXGetVariable2::SymbolId] = &method_getvariable;
 	
 	
 
