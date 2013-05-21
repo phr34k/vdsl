@@ -59,18 +59,24 @@ struct FlowHeader
 
 template<typename T> T& method_getproperty(void* a, int offset)
 {
+	//Template sugar
 	extern void* method_getpropertyaddr(void* a, int offset);
 	return *static_cast<T*>(method_getpropertyaddr(a, offset));
 }
 
 template<typename T> T& method_setproperty(void* a, int offset)
 {
+	//Template sugar
 	extern void* method_setpropertyaddr(void* a, int offset);
 	return *static_cast<T*>(method_setpropertyaddr(a, offset));
 }
 
 void* method_getpropertyaddr(void* a, int offset)
 {
+	//Each node can have one or more proprties. Each propety is represented by two relative pointers. One pointing to 
+	//the value it reads, and one pointing to the value it writes. This routine retrieves the adress for the former, 
+	//when the property is linked it points directly to the memory of another node, otherwise it points to the write 
+	//memory of itself.
 	char* s = reinterpret_cast<char*>(a) - 8 - offset * 8;
 	int* r = (int*)s;
 	return s + *r;	
@@ -78,13 +84,20 @@ void* method_getpropertyaddr(void* a, int offset)
 
 void* method_setpropertyaddr(void* a, int offset)
 {
+	//Each node can have one or more proprties. Each propety is represented by two relative pointers. One pointing to 
+	//the value it reads, and one pointing to the value it writes. This routine retrieves the adress for the latter. 
+	//Other nodes may reference this data.
 	char* s = reinterpret_cast<char*>(a) - 4 - offset * 8;
 	int* r = (int*)s;
 	return s + *r;	
 }
 
 void* method_readpropertyaddr(void* a, int offset)
-{
+{	
+	//This is a bit of hack, to support a concept i refer to as property overloading. Basicly in order allow certain properties 
+	//their types to be chosen at design time, we have to facillitate either rerouting the method invoked based on the 
+	//signature, or be able to deduct type information and perform make a decision at runtime. The latter has been implemented; 
+	//in the four bytes before the the actual data, a type id for the data is stored.
 	char* s = reinterpret_cast<char*>(a) - 4 - offset * 8;
 	int* r = (int*)s;
 	return (s + *r) - 4;	
@@ -92,6 +105,8 @@ void* method_readpropertyaddr(void* a, int offset)
 
 char* method_getnodename(void* a)
 {
+	//Each node can be assigned a name. When the node has no name assigned a simply '0' is returned. Otherwise retrieve 
+	//the name from the memory using relative pointers.
 	char* s = reinterpret_cast<char*>(a) + 4 + 4;
 	if( *reinterpret_cast<int*>(s)  == 0 ) 
 		return 0;
@@ -101,44 +116,67 @@ char* method_getnodename(void* a)
 
 int  method_getnodekind(void* a)
 {
+	//Each node references a type id, to identify the node. This is id is used in the 'dynamic reception' to map the correct 
+	//routines to each ot the nodes.
 	char* s = reinterpret_cast<char*>(a) + 4;
 	return *(int*)s;
 }
 
 void method_signal(void* a, int signal)
 {
+	//This function directly pre-activates and activates the specified node using the specified input. This method can 
+	//be used to implement events, such as a keypressed, or a keyreleased event. These are events that should be raised 
+	//by the host application.
+
 	char* executeFunction = (char*)a + method_exec;
 
 	__asm
 	{
+		//Prologue for pre-activation
 		push signal;
 		push a;		
+		//Pre-activate
 		call method_pexec;
 		call executeFunction;	
+		//Epilogue
 		add  esp, 8;
 	}	
 }
 
 void method_raise(void* a, int offset)
 {
+	//This function raises a output link of our node. Basicly this routine evaluates roughly as
+	//	foreach( emanating output in outputs ) 
+	//		method_signal(output.connectedTo as signal, output.connectedTo as node)
+
 	int r = method_table + prologue_size * 2 * offset;
 
 	__asm 
-	{	
+	{			
+		//Prologue for pre-activation
 		push eax
 		mov  eax, a;
 		add  eax, r;
-		add  eax, prologue_size;
+		add  eax, prologue_size;				
+		//Push a dummy variable so it matches the invocation signature (cdecl void)(void*, int)
 		push 6;
+		//Push a dummy variable so it matches the invocation signature (cdecl void)(void*, int)
 		push a;		
+		//Call the pre-activation routine (ret if not present), the dummy variables will be rewritten
 		call eax;
+		//Epilogue
 		add  esp, 8;
 
+		//Prologue for activation
 		mov  eax, a;
 		add  eax, r;
+		//Push a dummy variable so it matches the invocation signature (cdecl void)(void*, int)
 		push 6;
+		//Push a dummy variable so it matches the invocation signature (cdecl void)(void*, int)
 		push a;		
+		//Call the pre-activation routine (ret if not present), the dummy variables will be rewritten
 		call eax;
+		//Epilogue
 		add  esp, 8;
 		pop  eax;
 	}
@@ -149,6 +187,7 @@ void method_raise(void* a, int offset)
 
 void* method_getfirst(void* a)
 {
+	//Searches the flow executable for the first node.
 	if( *reinterpret_cast<int*>(a)  == 0 ) 
 		return 0;
 	else
@@ -161,6 +200,9 @@ void* method_next(void* a)
 	if( reinterpret_cast<char*>(a) + *reinterpret_cast<int*>(a) == a )
 		return 0;
 	*/
+
+	//Searches for the next flow node, given a input node. Each flow node is linked 
+	//using a cyclic linked list.
 	return reinterpret_cast<char*>(a) + *reinterpret_cast<int*>(a);
 }
 
@@ -168,6 +210,7 @@ void* method_next(void* a)
 
 void* method_getbyname(void* a, const char* name)
 {
+	//Seaches the the flow executable for the first node with a specific name.
 	void* node = 0, *f = method_getfirst(a), *n = f;
 	if( f != 0 ) do {
 		char* member = method_getnodename(f);		
@@ -181,6 +224,7 @@ void* method_getbyname(void* a, const char* name)
 
 void* method_get_global(void* a)
 {
+	//Fetch a global pointer, could be used to couple the flow executale to a particulair object.
 	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
 	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
 	baseImage += 12;
@@ -189,6 +233,7 @@ void* method_get_global(void* a)
 
 void  method_set_global(void* a, void* addr)
 {
+	//Store a global pointer, could be used to couple the flow executale to a particulair object.
 	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
 	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
 	baseImage += 12;
@@ -197,6 +242,7 @@ void  method_set_global(void* a, void* addr)
 
 unsigned int method_num_active_tokens(void* a)
 {
+	//Helper function to obtain the number of active tokens. Heap allocated types i.e. strings, vectors should be stored using tokens with copy-on-write semantics.
 	char* baseImage = (char*)a;
 	baseImage = baseImage + 8;
 	aurora::WeakReferenceManager<12, 15>& weakreferenceManager = *(aurora::WeakReferenceManager<12, 15>*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));	
@@ -205,6 +251,7 @@ unsigned int method_num_active_tokens(void* a)
 
 unsigned int method_createtoken(void* a, void* ptr)
 {
+	//Create a token. Heap allocated types i.e. strings, vectors should be stored using tokens with copy-on-write semantics.
 	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
 	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
 	void* ptr_diff = (void*)(static_cast<char*>(ptr) - static_cast<char*>(baseImage));
@@ -218,14 +265,9 @@ unsigned int method_createtoken(void* a, void* ptr)
 	return weakRefAsValue;
 }
 
-
-
-
-
-
-
 void  method_reftoken_inc(void* a, unsigned int token)
 {
+	//Increase the reference count for a token.
 	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
 	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage)) + 4;
 	
@@ -239,6 +281,7 @@ void  method_reftoken_inc(void* a, unsigned int token)
 
 void  method_reftoken_dec(void* a, unsigned int token, method_releasetokensig sig)
 {
+	//Decrease the reference count for a token. A release function is supplemented so the tokens can released 
 	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
 	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage)) + 4;
 
@@ -248,13 +291,15 @@ void  method_reftoken_dec(void* a, unsigned int token, method_releasetokensig si
 
 	aurora::WeakReferenceHandle<12, 15>& s = *(aurora::WeakReferenceHandle<12, 15>*)&token;	
 	if( --referenceCounter[s.m_index] == 0) {				
-		//sig(a, token);
-		//weakreferenceManager.Remove(s);	
+		sig(a, token);
+		weakreferenceManager.Remove(s);	
 	}
 }
 
 void method_compare_and_set_token(void* a, unsigned int index, unsigned int token, method_releasetokensig sig)
 {
+	//Helper method to replace a token on the write adress.
+
 	//Cache the tokens
 	int parentToken = *static_cast<unsigned int*>(method_getpropertyaddr(a, index));
 	int selfToken   = *static_cast<unsigned int*>(method_setpropertyaddr(a, index));
@@ -280,6 +325,7 @@ void method_compare_and_set_token(void* a, unsigned int index, unsigned int toke
 
 void method_compare_and_swap_token(void* a, unsigned int index, method_releasetokensig sig)
 {
+	//Helper method to exchange tokens from a read adress and write adress.
 	unsigned int d  = *static_cast<unsigned int*>(method_getpropertyaddr(a, index));
 	unsigned int c  = *static_cast<unsigned int*>(method_setpropertyaddr(a, index));	
 	if( d != c )
@@ -293,6 +339,7 @@ void method_compare_and_swap_token(void* a, unsigned int index, method_releaseto
 
 void* method_gettoken(void* a, unsigned int token)
 {
+	//Get the memory associated with the token.
 	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
 	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
 	baseImage = baseImage + 8;
@@ -305,6 +352,8 @@ void* method_gettoken(void* a, unsigned int token)
 
 int  method_gettokentype(void* a, unsigned int token)
 {	
+	//Get the type of token, the type can be used to differentiate between a char* literal and a char* allocated at runtime. Conceptually 
+	//a wide range of things can be expressable like this, collections, sets, dictionaries.
 	aurora::WeakReferenceHandle<12, 15>& s = *(aurora::WeakReferenceHandle<12, 15>*)&token;	
 	return s.m_type;
 }
@@ -315,6 +364,7 @@ int  method_gettokentype(void* a, unsigned int token)
 
 void* emitCharLiteral( bool preview, void* memory, const char* v)
 {
+	//Write a string literal to memory; preview is used to only participate in the memory adress computation.
 	char* real = static_cast<char*>( memory );
 	if( !preview )
 	{
@@ -327,6 +377,7 @@ void* emitCharLiteral( bool preview, void* memory, const char* v)
 
 void* emitRelative( bool preview, void* memory, void* memoryAdress)
 {
+	//Write a 32-bit relative pointer to memory; preview is used to only participate in the memory adress computation.
 	char* real = static_cast<char*>( memory );
 	if( !preview )
 	{		
@@ -343,6 +394,7 @@ void* emitRelative( bool preview, void* memory, void* memoryAdress)
 
 void* emitInt32( bool preview, void* memory, int value )
 {
+	//Write a 32-bit integer to memory; preview is used to only participate in the memory adress computation.
 	char* real = static_cast<char*>( memory );
 	if( !preview )
 	{		
@@ -357,6 +409,7 @@ void* emitInt32( bool preview, void* memory, int value )
 
 void* emitFloat( bool preview, void* memory, float value )
 {
+	//Write a 32-bit floating point to memory; preview is used to only participate in the memory adress computation.
 	char* real = static_cast<char*>( memory );
 	if( !preview )
 	{
@@ -372,6 +425,7 @@ void* emitFloat( bool preview, void* memory, float value )
 
 void* emitCall(bool preview, void* memory, void* memoryAdress)
 {
+	//Write a x86 call instruction to memory.
 	char* real = static_cast<char*>( memory );
 	if( !preview )
 	{
@@ -389,6 +443,7 @@ void* emitCall(bool preview, void* memory, void* memoryAdress)
 
 void* emitRet(bool preview, void* memory)
 {
+	//Write a x86 ret instruction to memory.
 	char* real = static_cast<char*>( memory );
 	if( !preview )
 	{
@@ -401,6 +456,7 @@ void* emitRet(bool preview, void* memory)
 
 void* emitJump(bool preview, void* memory, void* memoryAdress)
 {
+	//Write a x86 jump instruction to memory.
 	char* real = static_cast<char*>( memory );
 	if( !preview )
 	{
@@ -418,6 +474,7 @@ void* emitJump(bool preview, void* memory, void* memoryAdress)
 
 void* emitPushEAX(bool preview, void* memory)
 {
+	//Write a x86 push eax instruction to memory.
 	char* real = static_cast<char*>( memory );
 	if( !preview )
 	{
@@ -430,6 +487,7 @@ void* emitPushEAX(bool preview, void* memory)
 
 void* emitPush8(bool preview,void* memory, int value)
 {
+	//Write a x86 push 8-bit integer instruction to memory.
 	char* real = static_cast<char*>( memory );
 	if( !preview )
 	{
@@ -442,6 +500,7 @@ void* emitPush8(bool preview,void* memory, int value)
 
 void* emitAddEsp8(bool preview,void* memory, int value)
 {
+	//Write a x86 add esp by a 8-bit integer instruction to memory.
 	char* real = static_cast<char*>( memory );
 	if( !preview )
 	{
@@ -455,19 +514,20 @@ void* emitAddEsp8(bool preview,void* memory, int value)
 
 void* emitGetRelativeAdress(bool preview,void* memory, void* memoryAdress)
 {
+	//Write a x86 snippet to retrieve a relative pointer to the instruction pointer.
 	char* real = static_cast<char*>( memory );
 	if( !preview )
 	{
 		int   diff = static_cast<char*>( memoryAdress ) - static_cast<char*>( &real[11] );
 		char* v = reinterpret_cast<char*>( &diff );	
-		real[0] = 0xEB;
+		real[0] = 0xEB; //jmp 4 (@call real + 2)
 		real[1] = 0x04;
-		real[2] = 0x8B;
-		real[3] = 0x04;
-		real[4] = 0x24;
-		real[5] = 0xC3;	
-		emitCall(preview, real + 6, real + 2 );			
-		real[11] = 0x05;	
+		real[2] = 0x8B;	//mov ebp-4, eax
+		real[3] = 0x04; 
+		real[4] = 0x24;	
+		real[5] = 0xC3;	//ret
+		emitCall(preview, real + 6, real + 2 );		//call real + 2	
+		real[11] = 0x05; //add eax + diff	
 		real[12] = v[0];	
 		real[13] = v[1];	
 		real[14] = v[2];	
@@ -486,14 +546,14 @@ void* emitPrologue(bool preview,void* memory, void* memoryAdress, int source)
 		char* v = reinterpret_cast<char*>( &memoryAdress );
 		char* s = reinterpret_cast<char*>( &source );
 
-
+		//Get relative adress from the instruction pointer (stored in eax).
 		real = (char*)emitGetRelativeAdress(preview, real, memoryAdress);
 
 
 		
 		//int   diff = static_cast<char*>( memoryAdress ) - static_cast<char*>( memory ) - 5;
 		//char* v = reinterpret_cast<char*>( &diff );	
-		real[0] = 0x83;
+		real[0] = 0x83; //mov ebp, ebp - 4
 		real[1] = 0xC4;
 		real[2] = 0x04;
 
@@ -507,21 +567,21 @@ void* emitPrologue(bool preview,void* memory, void* memoryAdress, int source)
 		real[9] = v[3];
 		*/
 
-		real[3] = 0x89;
+		real[3] = 0x89; //mov ebp, @eax
 		real[4] = 0x04;
 		real[5] = 0x24;
-		real[6] = 0x90;
-		real[7] = 0x90;
-		real[8] = 0x90;
-		real[9] = 0x90;
+		real[6] = 0x90;	//nop;
+		real[7] = 0x90;	//nop;
+		real[8] = 0x90;	//nop;
+		real[9] = 0x90;	//nop;
 
 		  
 
-		real[10] = 0x83;
+		real[10] = 0x83; //mov ebp, ebp - 4
 		real[11] = 0xC4;
 		real[12] = 0x04;
 
-		real[13] = 0xC7;
+		real[13] = 0xC7; //mov ebp, (@slot)
 		real[14] = 0x04;
 		real[15] = 0x24;
 		real[16] = s[0];
@@ -529,7 +589,7 @@ void* emitPrologue(bool preview,void* memory, void* memoryAdress, int source)
 		real[18] = s[2];
 		real[19] = s[3];
 
-		real[20] = 0x83;
+		real[20] = 0x83; //mov ebp, ebp + 8
 		real[21] = 0xEC;
 		real[22] = 0x08;
 
@@ -547,6 +607,9 @@ void* emitPrologue(bool preview,void* memory, void* memoryAdress, int source)
 
 void* emitNodePrologue(bool preview,void* sequence, void* a, TiXmlElement* instanceInfo, TiXmlElement* typeInfo)
 {	
+	//Nodes the have multiple emanating arcs from a single output property must have a intermediate method generated 
+	//that can activate all of the arcs. This is because our node structure reserves memory for one method per output 
+	//link.
 	void* methodBody = sequence;
 	TiXmlElement* document = instanceInfo->Parent()->ToElement();
 	TiXmlElement* node = document->FirstChildElement();
@@ -593,6 +656,7 @@ void* emitNodePrologue(bool preview,void* sequence, void* a, TiXmlElement* insta
 
 void emitPreNodeData(TiXmlElement* instanceInfo, TiXmlElement* typeInfo, unsigned int& tokenCount, std::map<std::string, void*>& stringInterning  )
 {
+	//Before the node data, is emited perform a pass for string-interning.
 	TiXmlElement* node = typeInfo->FirstChildElement();
 	for( ; node != 0; node = node->NextSiblingElement()) {
 		if( stricmp(node->Value(), "Member") == 0x0 /*&& stricmp(node->Attribute("Name"), "Out")*/ ) {							
@@ -855,9 +919,13 @@ void* emitLink(void* node1, void* node2, int offset, int source)
 
 void emitDataLink(void* node1, void* node2, int offset1, int offset2)
 {
-	void* a = reinterpret_cast<char*>(node1) - 4 - 8 * offset1;
-	void* s = reinterpret_cast<char*>(node2) - 8 - 8 * offset2;
-	emitRelative(false, s, reinterpret_cast<char*>(a) + *(int*)a);
+	//Links the data of two nodes together.
+	//read ptr for property of node1
+	void* a = reinterpret_cast<char*>(node1) - 4 - 8 * offset1;	
+	//write-ptr for property of node2
+	void* s = reinterpret_cast<char*>(node2) - 8 - 8 * offset2; 
+	//set the read-ptr to the write-ptr.
+	emitRelative(false, s, reinterpret_cast<char*>(a) + *(int*)a); 
 }
 
 
@@ -866,8 +934,6 @@ void emitDataLink(void* node1, void* node2, int offset1, int offset2)
 
 
 
-
-extern aurora::WeakReferenceManager<12, 15> weakreferenceManager;
 
 
 struct ltstr
@@ -1289,7 +1355,7 @@ void* parse(const char* metaformat, const char* filename, int& outputSize)
 
 	if( filename == 0x0 )
 	{
-		printf("No meta-format specified\r\n");
+		printf("No filename specified\r\n");
 		return 0;
 	}
 
@@ -1438,7 +1504,7 @@ void* parse(const char* metaformat, const char* filename, int& outputSize)
 		assert( ((char*)sequence - (char*)address) < maxSize );
 		w->Reset();
 
-
+		//Emit all strings that are interned
 		std::map<std::string, void*>::iterator itt;
 		for( itt = stringInterning.begin(); itt != stringInterning.end(); ++itt )
 		{			
@@ -1447,6 +1513,7 @@ void* parse(const char* metaformat, const char* filename, int& outputSize)
 			assert( ((char*)sequence - (char*)address) < maxSize );
 		}
 		
+		//Emit all remaining node data.
 		node = doc1.FirstChildElement()->FirstChildElement();
 		for( ; node != 0; node = node->NextSiblingElement()) 
 		{		
@@ -1485,9 +1552,14 @@ void dynamic_receptors_link(std::map<int, method_signature> const& functionMappi
 	void *f = method_getfirst(adress), *n = f;
 	if( f != 0 ) do 
 	{
+		//Get the type of node, which is the ordial of the node, in our schema format.
 		void* prev = f;
 		int kind = method_getnodekind(prev);			
 			
+		//Match the type of the node to a function where that we want to link in. Currently all functions 
+		//are linked in this way, even built-ins. As long as we have a function that follows the abi (__cdecl)
+		//we're happy. So conceptually we can get the functions from our runtime, or even a dynamicly reflected 
+		//dll.
 		itt = functionMapping.find(kind);
 		if( itt != functionMapping.end() ) {				
 			emitJump(false, reinterpret_cast<char*>(prev) + method_exec, itt->second);
@@ -1497,31 +1569,39 @@ void dynamic_receptors_link(std::map<int, method_signature> const& functionMappi
 			}
 		}
 		
+		//Perform the same type of mapping but also for preactivation functions. When a node gets activated, each of the node
+		//it's referencing for it's data-dependecies gets preactivated. At this point, it can perform any number of tasks to 
+		//update its value. For example 'random number between 10 and 100', 'get local player'
 		itt = coerceMapping.find(kind);
 		if( itt != coerceMapping.end() ) {				
 			emitJump(false, reinterpret_cast<char*>(prev) + method_pexec2, itt->second);
 		}		
 
-	} while( n != (f = method_next(f)) );
+	} 	
+	while( n != (f = method_next(f)) );
 }
 
 
 void* load(void* global, void* address, int maxSize)
 {
-	//Set global data
+	//Set global data pointer, for example a pointer to an object, or a level.
 	char* baseImage = (char*)address; baseImage += 12;
 	*reinterpret_cast<void**>(baseImage) = global;	
 
-
+	//Change the virtual protection mode to permit executing the memory. Conceptually for linux, mprotect can
+	//be used in the following line.
 	DWORD oldExecutingMode;
 	VirtualProtect(address, maxSize, PAGE_EXECUTE_READWRITE, &oldExecutingMode );
-	FlushInstructionCache(GetCurrentProcess(), address, maxSize );	
+
+	//Flush the instruction cache to ensure, the cache doesn't hold a wrong view of the memory.
+	FlushInstructionCache(GetCurrentProcess(), address, maxSize );
 	return address;
 }
 
 void unload(void* address)
 {
-	//Reset the virtual procetion mode to the default read/write memory.
+	//Reset the virtual procetion mode to the default read/write memory. Conceptually for linux, mprotect can
+	//be used in the following line.
 	DWORD oldExecutingMode;
 	VirtualProtect(address, 4096, PAGE_READWRITE, &oldExecutingMode );  
 	//Free the actual memory.

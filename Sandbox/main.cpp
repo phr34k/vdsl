@@ -640,7 +640,8 @@ void main(int argc, char** argv)
 {
 	if( argc == 1 )
 	{
-		printf("Please do not run me directly\r\n");
+		printf("This executable was designed to run from the SandboxDesigner\r\n");
+		printf("Usage: Sandbox.exe filename schemafilename \r\n");
 		getchar();
 		return;
 	}
