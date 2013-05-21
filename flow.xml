@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <Flow>
   
-  <Type Name="int2" Editor="MyParam9"/>
   <Type Name="int" Editor="MyParam6"/>
   <Type Name="float" Editor="MyParam6"/>
   <Type Name="quaternion" Editor="MyParam5"/>
