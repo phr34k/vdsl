@@ -18,7 +18,8 @@ Debug
 *.suo
 *.ilk
 *.pdb
-*.exe
 *.user
 *.sdf
 *.old
+Release/*.exe
+Debug/*.exe

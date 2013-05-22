@@ -94,16 +94,17 @@
                                     <s:DesignerConnectionPresenter Data=" M 0 10 L 5 5 L 0 0" Grid.Row="1" />
                                     <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"
                                          x:Name="Items" Grid.Row="1"  />
-                                </Grid>
-                            </s:DesignerScrollViewer>                            
-                            <Border Grid.Row="2" x:Name="Container">
+                                </Grid>                                
+                            </s:DesignerScrollViewer>
+                            
+                            <Border Grid.Row="2" x:Name="Container" Background="#FEFEFE" >
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="0" >
-                                        <TextBox Width="300" x:Name="Part_Search" Margin="2,2,2,2">
+                                        <TextBox Width="300" x:Name="Part_Search" Margin="2,2,2,2" VerticalAlignment="Center">
                                             <TextBox.InputBindings>
                                                 <KeyBinding Command="{x:Static s:DesignerCanvasCommands.Search}" Key="Enter"/>
                                             </TextBox.InputBindings>
@@ -112,19 +113,30 @@
                                                   VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1">
-                                        <Button Content="Decrease" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
-                                            Command="{x:Static s:DesignerCanvasCommands.DecreaseZoom}"/>
+                                        <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
+                                            Command="{x:Static s:DesignerCanvasCommands.DecreaseZoom}">
+                                            <Button.Content>
+                                                <Image Source="pack://application:,,,/Aurora.SandboxDesigner;Component/Themes/Zoom_Out.png"/>                                                                                               
+                                            </Button.Content>
+                                        </Button>
                                         <Slider Width="{Binding ElementName=Container,Path=ActualWidth}"  MaxWidth="300" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Zoom, Mode=TwoWay}" Minimum="0.1" Maximum="1.0"
-                                        HorizontalAlignment="Right"/>                                        
-                                        <Button Content="Increase" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
-                                            Command="{x:Static s:DesignerCanvasCommands.IncreaseZoom}"/>
-                                        <Button Content="C" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
-                                            Command="{x:Static s:DesignerCanvasCommands.ToggleConnections}"/>
-                                        <Button Content="G" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
-                                            Command="{x:Static s:DesignerCanvasCommands.ToggleGridLines}"/>
+                                        HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
+                                            Command="{x:Static s:DesignerCanvasCommands.IncreaseZoom}">
+                                            <Button.Content>
+                                                <Image Source="pack://application:,,,/Aurora.SandboxDesigner;Component/Themes/Zoom_In.png"/>
+                                            </Button.Content>
+                                        </Button>
+                                        <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" 
+                                            Command="{x:Static s:DesignerCanvasCommands.ToggleGridLines}">
+                                            <Button.Content>
+                                                <Image Source="pack://application:,,,/Aurora.SandboxDesigner;Component/Themes/Grid.png"/>
+                                            </Button.Content>                                            
+                                        </Button>
                                     </StackPanel>
                                 </Grid>                                
                             </Border>
+                                <Separator Grid.Row="2" Background="#8B000000" Height="1"  VerticalAlignment="Top"/>
                         </Grid>                        
                     </Border>
                     <ControlTemplate.Triggers>
