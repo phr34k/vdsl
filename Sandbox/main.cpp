@@ -41,6 +41,11 @@
 #include "Generated.h"
 
 
+void __cdecl method_assert(const char* method)
+{
+
+}
+
 void __cdecl method_releasetoken(void* a, unsigned int token)
 {
 	//Releasing token	
@@ -676,7 +681,7 @@ void main(int argc, char** argv)
 	using namespace flow;
 
 	//Setup function mapping
-	std::map<int, method_signature> functionMapping;
+	function_dictionary functionMapping;
 	functionMapping[CompareBool::SymbolId] = &method_comparison_bool;	
 	functionMapping[CompareInt32::SymbolId] = &method_comparison_int32;
 	functionMapping[CompareFloat::SymbolId] = &method_comparison_float;
@@ -716,7 +721,7 @@ void main(int argc, char** argv)
 	functionMapping[Raise::SymbolId] = &method_raise_signal;
 
 	//Setup coerce value mapping
-	std::map<int, method_signature> coerceMapping;
+	function_dictionary coerceMapping;
 	coerceMapping[RandomInt32::SymbolId]   = &method_preexecute_random_int32;
 	coerceMapping[RandomFloat::SymbolId]   = &method_preexecute_random_real32;
 

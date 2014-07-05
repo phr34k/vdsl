@@ -23,3 +23,4 @@ Debug
 *.old
 Release/*.exe
 Debug/*.exe
+VDSL2010.opensdf

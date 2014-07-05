@@ -33,6 +33,66 @@
 
 #include <map>
 
+template<class _Ty> class flow_allocator : public std::allocator<_Ty>
+{
+public:
+	void construct(pointer _Ptr, const _Ty& _Val)
+	{	
+		::new (_Ptr) _Ty(_Val);
+	}
+	flow_allocator() : allocator() { }
+	flow_allocator(const flow_allocator& other) throw() : allocator(other)
+	{
+		
+	}
+
+	template <class U> flow_allocator(const flow_allocator<U>& alloc) throw() : allocator(alloc)
+	{
+
+	}
+
+
+	pointer allocate(size_type n)
+	{	
+		if (n <= 0)
+			n = 0;
+		else if (((size_t)(-1) / n) < sizeof(_Ty))
+			throw std::bad_alloc();		
+		const int size = n * sizeof(_Ty);
+		_Ty* ptr = static_cast<_Ty*>(userAlloc(size));
+		if( !ptr ) 
+			throw std::bad_alloc();		
+		return ptr;
+	}
+
+	pointer allocate(size_type n, allocator<void>::const_pointer hint)
+	{	
+		return allocate(n);
+	}
+
+	void deallocate (pointer p, size_type n)
+	{
+		return userFree(p);
+	}
+
+    template <class Type> struct rebind {
+		typedef flow_allocator<Type> other;
+	};
+
+	void* userAlloc(int size)
+	{
+		//MemoryService::system->allocate(size, 0)
+		return malloc(size);
+	}
+
+	void userFree(void* ptr)
+	{
+		//MemoryService::system->deallocate(p)
+		free(ptr);
+	}
+
+};
+
 //Imported methods
 template<typename T> T& method_getproperty(void* a, int offset)
 {
@@ -56,6 +116,8 @@ template<typename T> T& method_readproperty(void* a, int offset)
 
 typedef void (__cdecl *method_signature)(void* a, int signal);
 typedef void (__cdecl *method_releasetokensig)(void* a, unsigned int token);
+typedef std::map<int, method_signature, std::less<int>, flow_allocator<std::pair<int, method_signature>>> 
+	function_dictionary;
 
 
 extern void* method_gettoken(void* a, unsigned int token);
@@ -66,6 +128,8 @@ extern void method_reftoken_dec(void* a, unsigned int token, method_releasetoken
 extern void method_compare_and_set_token(void* a, unsigned int index, unsigned int token, method_releasetokensig sig);
 extern void method_compare_and_swap_token(void* a, unsigned int index, method_releasetokensig sig);
 
+class TiXmlDocument;
+extern void* parse(TiXmlDocument& metaformat, TiXmlDocument& filename, int& outputSize);
 extern void* parse(const char* metaformat, const char* filename, int& outputSize);
 extern int  method_getnodekind(void* a);
 extern void* method_getfirst(void* a);
@@ -75,7 +139,8 @@ extern void* method_getbyname(void* a, const char* name);
 extern unsigned int method_num_active_tokens(void* a);
 
 extern void method_raise(void* a, int offset);
-extern void dynamic_receptors_link(std::map<int, method_signature> const& functionMapping, std::map<int, method_signature> const& coerceMapping, method_signature def, void* adress);
+extern void dynamic_receptors_link(function_dictionary const& functionMapping, function_dictionary const& coerceMapping, method_signature def, void* adress);
+extern void  setglobal(void* global, void* address);
 extern void* load(void* global, void* address, int maxSize);
 extern void  unload(void* address);
 

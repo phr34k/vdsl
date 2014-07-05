@@ -31,6 +31,7 @@
  *
  */
 
+#include "generator.h"
 #include <stdio.h>
 #include <malloc.h>
 #include <windows.h>
@@ -38,8 +39,9 @@
 #include <map>
 #include "tinyxml.h"
 #include "weak.h"
-#include "Generated.h"
 
+
+const int ptr_size		= sizeof(void*);
 const int prologue_jump = /*13*/ 23 + 16;
 const int prologue_size = /*18*/ prologue_jump + 5;
 const int method_base   = 4 + 4 + 4 + 4;
@@ -48,7 +50,21 @@ const int method_exec   = method_base;
 const int method_pexec  = method_base + 5;
 const int method_pexec2  = method_base + 5 + 5;
 
+struct ltstr
+{
+  bool operator()(const char* s1, const char* s2) const
+  {
+    return strcmp(s1, s2) < 0;
+  }
+};
+
 typedef void (__cdecl *method_releasetokensig)(void* a, unsigned int token);
+typedef std::map<unsigned int, TiXmlElement*, std::less<int>, flow_allocator<std::pair<unsigned int, TiXmlElement*>>> dictionary_nodexml;
+typedef std::map<std::string, int, std::less<std::string>, flow_allocator<std::pair<std::string,  int>>> dictionary_ordeal;
+typedef std::map<std::string, TiXmlElement*, std::less<std::string>, flow_allocator<std::pair<std::string,  TiXmlElement*>>> dictionary_types;
+typedef std::map<std::string, void*, std::less<std::string>, flow_allocator<std::pair<std::string,  void*>>> dictionary_strings;
+typedef std::multimap<const char*, TiXmlElement*, ltstr, flow_allocator<std::pair<const char*, TiXmlElement*>>> dictionary_connections;
+
 
 struct FlowHeader
 {
@@ -57,6 +73,9 @@ struct FlowHeader
 };
 
 
+
+
+/*
 template<typename T> T& method_getproperty(void* a, int offset)
 {
 	//Template sugar
@@ -70,6 +89,7 @@ template<typename T> T& method_setproperty(void* a, int offset)
 	extern void* method_setpropertyaddr(void* a, int offset);
 	return *static_cast<T*>(method_setpropertyaddr(a, offset));
 }
+*/
 
 void* method_getpropertyaddr(void* a, int offset)
 {
@@ -225,7 +245,7 @@ void* method_getbyname(void* a, const char* name)
 void* method_get_global(void* a)
 {
 	//Fetch a global pointer, could be used to couple the flow executale to a particulair object.
-	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
+	char* baseImage = reinterpret_cast<char*>(a) + ptr_size + ptr_size + ptr_size;
 	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
 	baseImage += 12;
 	return *reinterpret_cast<void**>(baseImage);
@@ -234,7 +254,7 @@ void* method_get_global(void* a)
 void  method_set_global(void* a, void* addr)
 {
 	//Store a global pointer, could be used to couple the flow executale to a particulair object.
-	char* baseImage = reinterpret_cast<char*>(a) + 4 + 4 + 4;
+	char* baseImage = reinterpret_cast<char*>(a) + ptr_size + ptr_size + ptr_size;
 	baseImage = (char*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
 	baseImage += 12;
 	*reinterpret_cast<void**>(baseImage) = addr;
@@ -259,10 +279,21 @@ unsigned int method_createtoken(void* a, void* ptr)
 	unsigned int* referenceCounter = (unsigned int*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
 	baseImage = baseImage + 4;
 	aurora::WeakReferenceManager<12, 15>& weakreferenceManager = *(aurora::WeakReferenceManager<12, 15>*)(reinterpret_cast<char*>(baseImage)  + *reinterpret_cast<int*>(baseImage));
-	aurora::WeakReferenceHandle<12,15> h = weakreferenceManager.Add(ptr_diff, 1);				
-	unsigned int weakRefAsValue = h;
-	referenceCounter[h.m_index] = 1;
-	return weakRefAsValue;
+
+
+	if( weakreferenceManager.m_activeEntryCount < weakreferenceManager.m_maximumEntryCount )
+	{
+		aurora::WeakReferenceHandle<12,15> h = weakreferenceManager.Add(ptr_diff, 1);				
+		unsigned int weakRefAsValue = h;
+		referenceCounter[h.m_index] = 1;
+		return weakRefAsValue;
+	}	
+	else
+	{
+		extern void __cdecl method_assert(const char* message);
+		method_assert("Insufficient tokens\r\n");
+		return 0xFFFFFFFF;
+	}
 }
 
 void  method_reftoken_inc(void* a, unsigned int token)
@@ -654,7 +685,7 @@ void* emitNodePrologue(bool preview,void* sequence, void* a, TiXmlElement* insta
 
 
 
-void emitPreNodeData(int version, TiXmlElement* instanceInfo, TiXmlElement* typeInfo, unsigned int& tokenCount, std::map<std::string, void*>& stringInterning  )
+void emitPreNodeData(int version, TiXmlElement* instanceInfo, TiXmlElement* typeInfo, unsigned int& tokenCount, dictionary_strings& stringInterning  )
 {
 	if( version == 1 )
 	{
@@ -699,8 +730,8 @@ void emitPreNodeData(int version, TiXmlElement* instanceInfo, TiXmlElement* type
 
 void* emitNodeDataInner(bool preview, void* sequence, void* a, TiXmlElement* instanceInfo, TiXmlElement* typeInfo, void* base, 
 						unsigned int* referenceCounter, aurora::WeakReferenceManager<12, 15>& weakreferenceManager, 
-						std::map<std::string, void*>& stringInterning,
-						std::map<unsigned int, TiXmlElement*>& node_mappings2,						
+						dictionary_strings& stringInterning,
+						dictionary_nodexml& node_mappings2,						
 						const char* propertyValue,
 						const char* type,
 						const char* types,						
@@ -824,7 +855,7 @@ void* emitNodeDataInner(bool preview, void* sequence, void* a, TiXmlElement* ins
 	return sequence;
 }
 
-void* emitNodeData(bool preview, void* sequence, void* a, TiXmlElement* instanceInfo, TiXmlElement* typeInfo, void* base, unsigned int* referenceCounter, aurora::WeakReferenceManager<12, 15>& weakreferenceManager, std::map<std::string, void*>& stringInterning, std::map<unsigned int, TiXmlElement*>& node_mappings, std::map<unsigned int, TiXmlElement*>& node_mappings2 )
+void* emitNodeData(bool preview, void* sequence, void* a, TiXmlElement* instanceInfo, TiXmlElement* typeInfo, void* base, unsigned int* referenceCounter, aurora::WeakReferenceManager<12, 15>& weakreferenceManager, dictionary_strings& stringInterning, dictionary_nodexml& node_mappings, dictionary_nodexml& node_mappings2 )
 {
 	//Emit the data-member patch table..
 	TiXmlElement* node = typeInfo->FirstChildElement();
@@ -1025,9 +1056,6 @@ void* emitNode( bool preview, int nodeKind, void* memory, FlowHeader* header, vo
 
 void* emitLink(void* node1, void* node2, int offset, int source)
 {
-	bool crit1 = method_getnodekind(node1) == flow::CompareInt32::SymbolId || method_getnodekind(node2) == flow::CompareInt32::SymbolId;
-	bool crit2 = method_getnodekind(node1) == flow::SubtractInt32::SymbolId || method_getnodekind(node2) == flow::SubtractInt32::SymbolId;
-
 	void* a = reinterpret_cast<char*>(node1) + method_table + (prologue_size * 2 * offset) + 0;
 	void* s = reinterpret_cast<char*>(node1) + method_table + (prologue_size * 2 * offset) + prologue_jump;
 
@@ -1069,18 +1097,12 @@ void emitDataLink(void* node1, void* node2, int offset1, int offset2)
 
 
 
-struct ltstr
-{
-  bool operator()(const char* s1, const char* s2) const
-  {
-    return strcmp(s1, s2) < 0;
-  }
-};
 
 
-void* emitNodeMultiConnections( bool preview, void* sequence, TiXmlDocument& doc1, std::map<unsigned int, TiXmlElement*>& node_mappings, std::map<unsigned int, TiXmlElement*>& node_mappings2)
+
+void* emitNodeMultiConnections( bool preview, void* sequence, TiXmlDocument& doc1, dictionary_nodexml& node_mappings, dictionary_nodexml& node_mappings2)
 {
-	std::multimap<const char*, TiXmlElement*, ltstr> connectionMap;
+	dictionary_connections connectionMap;
 	
 	
 	TiXmlElement *node;
@@ -1100,7 +1122,7 @@ void* emitNodeMultiConnections( bool preview, void* sequence, TiXmlDocument& doc
 
 
 	int count = 0;
-	std::multimap<const char*, TiXmlElement*, ltstr>::iterator current = connectionMap.begin(), upper, lower2;
+	dictionary_connections::iterator current = connectionMap.begin(), upper, lower2;
 	while( current != connectionMap.end() ) 
 	{
 		lower2   = connectionMap.lower_bound( current->first );		
@@ -1116,7 +1138,7 @@ void* emitNodeMultiConnections( bool preview, void* sequence, TiXmlDocument& doc
 
 
 			void* methodBody1 = sequence;			
-			for( std::multimap<const char*, TiXmlElement*, ltstr>::iterator lower = lower2; lower != upper; lower++ ) 
+			for( dictionary_connections::iterator lower = lower2; lower != upper; lower++ ) 
 			{				
 				//Resolve the destination				
 				TiXmlElement* connection = lower->second;
@@ -1167,7 +1189,7 @@ void* emitNodeMultiConnections( bool preview, void* sequence, TiXmlDocument& doc
 			sequence = emitRet(preview, sequence);
 
 			void* methodBody2 = sequence;			
-			for( std::multimap<const char*, TiXmlElement*, ltstr>::iterator lower = lower2; lower != upper; lower++ ) 
+			for( dictionary_connections::iterator lower = lower2; lower != upper; lower++ ) 
 			{				
 				//Resolve the destination				
 				TiXmlElement* connection = lower->second;
@@ -1361,9 +1383,9 @@ void  parse_identifier(const char* value,  unsigned int& node, const char* name,
 	}
 }
 
-void  parse_overwrite_data(TiXmlDocument& doc1, std::map<unsigned int, TiXmlElement*>& node_mappings, std::map<unsigned int, TiXmlElement*>& node_mappings2)
+void  parse_overwrite_data(TiXmlDocument& doc1, dictionary_nodexml& node_mappings, dictionary_nodexml& node_mappings2)
 {
-	std::multimap<const char*, TiXmlElement*, ltstr> connectionMap;
+	dictionary_connections connectionMap;
 	
 	
 	TiXmlElement *node;
@@ -1528,29 +1550,8 @@ void  parse_overwrite_data(TiXmlDocument& doc1, std::map<unsigned int, TiXmlElem
 	}
 }
 
-
-void* parse(const char* metaformat, const char* filename, int& outputSize)
+void* parse(TiXmlDocument& doc2, TiXmlDocument& doc1, int& outputSize)
 {
-	if( metaformat == 0x0 )
-	{
-		printf("No meta-format specified\r\n");
-		return 0;
-	}
-
-	if( filename == 0x0 )
-	{
-		printf("No filename specified\r\n");
-		return 0;
-	}
-
-
-	
-
-
-	//Perform loading of the document
-	TiXmlDocument doc1, doc2;
-	doc1.LoadFile(filename);
-	doc2.LoadFile(metaformat);
 	if( doc1.Error() || doc1.FirstChildElement() == 0 || stricmp(doc1.FirstChildElement()->Value(), "Flow") != 0x0 )
 	{
 		printf("File contains errors\r\n");
@@ -1572,11 +1573,11 @@ void* parse(const char* metaformat, const char* filename, int& outputSize)
 
 		//Auxillary data structures
 		TiXmlElement *node; void* weakReferenceTable, *countedReferenceTable;
-		std::map<std::string,  int>			  type_ordialmapping;
-		std::map<std::string,  TiXmlElement*> type_descriptor;
-		std::map<unsigned int, TiXmlElement*> node_mappings;
-		std::map<unsigned int, TiXmlElement*> node_mappings2;		
-		std::map<std::string, void*>		  stringInterning;
+		dictionary_ordeal  type_ordialmapping;
+		dictionary_types   type_descriptor;
+		dictionary_nodexml node_mappings;
+		dictionary_nodexml node_mappings2;		
+		dictionary_strings stringInterning;
 
 		//Always construct one extra token.
 		unsigned int tokenCount = 1; 
@@ -1689,8 +1690,8 @@ void* parse(const char* metaformat, const char* filename, int& outputSize)
 		assert( ((char*)sequence - (char*)address) < maxSize );
 		w->Reset();
 
-		//Emit all strings that are interned
-		std::map<std::string, void*>::iterator itt;
+
+		dictionary_strings::iterator itt;
 		for( itt = stringInterning.begin(); itt != stringInterning.end(); ++itt )
 		{			
 			stringInterning[itt->first] = sequence;
@@ -1716,9 +1717,9 @@ void* parse(const char* metaformat, const char* filename, int& outputSize)
 		
 
 		parse_overwrite_data(doc1, node_mappings, node_mappings2);		
-		emitRelative(false, (char*)address + 0, header.head);
-		emitRelative(false, (char*)address + 4, countedReferenceTable);		
-		emitRelative(false, (char*)address + 8, weakReferenceTable);
+		emitRelative(false, (char*)address + ptr_size * 0, header.head);
+		emitRelative(false, (char*)address + ptr_size * 1, countedReferenceTable);		
+		emitRelative(false, (char*)address + ptr_size * 2, weakReferenceTable);
 
 
 		outputSize = maxSize;
@@ -1728,12 +1729,29 @@ void* parse(const char* metaformat, const char* filename, int& outputSize)
 	}			
 }
 
-
-
-typedef void (__cdecl *method_signature)(void* a, int signal);
-void dynamic_receptors_link(std::map<int, method_signature> const& functionMapping, std::map<int, method_signature> const& coerceMapping, method_signature def, void* adress)
+void* parse(const char* metaformat, const char* filename, int& outputSize)
 {
-	std::map<int, method_signature>::const_iterator itt;
+	if( metaformat == 0x0 )
+	{
+		printf("No meta-format specified\r\n");
+		return 0;
+	}
+
+	if( filename == 0x0 )
+	{
+		printf("No filename specified\r\n");
+		return 0;
+	}
+
+	TiXmlDocument doc1, doc2;
+	doc1.LoadFile(filename);
+	doc2.LoadFile(metaformat);
+	return parse(doc2, doc1, outputSize);
+}
+
+void dynamic_receptors_link(function_dictionary const& functionMapping, function_dictionary const& coerceMapping, method_signature def, void* adress)
+{
+	function_dictionary::const_iterator itt;
 	void *f = method_getfirst(adress), *n = f;
 	if( f != 0 ) do 
 	{
@@ -1773,24 +1791,31 @@ void* load(void* global, void* address, int maxSize)
 	char* baseImage = (char*)address; baseImage += 12;
 	*reinterpret_cast<void**>(baseImage) = global;	
 
-	//Change the virtual protection mode to permit executing the memory. Conceptually for linux, mprotect can
-	//be used in the following line.
-	DWORD oldExecutingMode;
-	VirtualProtect(address, maxSize, PAGE_EXECUTE_READWRITE, &oldExecutingMode );
-
-	//Flush the instruction cache to ensure, the cache doesn't hold a wrong view of the memory.
-	FlushInstructionCache(GetCurrentProcess(), address, maxSize );
-	return address;
+	#ifdef WIN32 || WIN64
+		//Change the virtual protection mode to permit executing the memory. Conceptually for linux, mprotect can
+		//be used in the following line.
+		DWORD oldExecutingMode;
+		VirtualProtect(address, maxSize, PAGE_EXECUTE_READWRITE, &oldExecutingMode );
+		//Flush the instruction cache to ensure, the cache doesn't hold a wrong view of the memory.
+		FlushInstructionCache(GetCurrentProcess(), address, maxSize );
+		return address;
+	#else		
+		#error "Platform not supported"
+	#endif
 }
 
 void unload(void* address)
 {
-	//Reset the virtual procetion mode to the default read/write memory. Conceptually for linux, mprotect can
-	//be used in the following line.
-	DWORD oldExecutingMode;
-	VirtualProtect(address, 4096, PAGE_READWRITE, &oldExecutingMode );  
-	//Free the actual memory.
-	_aligned_free(address);
+	#ifdef WIN32 || WIN64
+		//Reset the virtual procetion mode to the default read/write memory. Conceptually for linux, mprotect can
+		//be used in the following line.
+		DWORD oldExecutingMode;
+		VirtualProtect(address, 4096, PAGE_READWRITE, &oldExecutingMode );  
+		//Free the actual memory.
+		_aligned_free(address);
+	#else		
+		#error "Platform not supported"
+	#endif
 }
 
 
