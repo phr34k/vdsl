@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="Windows-1252"?>
-<Flow>
+<Flow
+  Version="2">
   <Node
     Id="1A620A72"
     Type="GFXGetVariable2"
     Designer.Name="1a620a72"
-    Movie="0"
-    Value="0"
     Designer.OffsetX="444"
     Designer.OffsetY="82.04">
     <Property
       Name="Movie"
-      Type="int" />
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Variable" />
     <Property
       Name="Value"
-      Type="int" />
+      Type="int"
+      Value="0" />
   </Node>
   <Node
     Id="1A2EABBF"
@@ -25,62 +28,64 @@
     Id="1A2D20E7"
     Type="AddInt32"
     Designer.Name="1a2d20e7"
-    A="0"
-    B="19"
-    C="0"
     Designer.OffsetX="740"
     Designer.OffsetY="82.04">
     <Property
       Name="A"
-      Type="int" />
+      Type="int"
+      Value="0" />
     <Property
       Name="B"
-      Type="int" />
+      Type="int"
+      Value="19" />
     <Property
       Name="C"
-      Type="int" />
+      Type="int"
+      Value="0" />
   </Node>
   <Node
     Id="1AE4B071"
     Type="GFXGetVariable2"
     Designer.Name="1ae4b071"
-    Movie="0"
-    Value="0"
     Designer.OffsetX="445"
     Designer.OffsetY="203.04">
     <Property
       Name="Movie"
-      Type="int" />
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Variable" />
     <Property
       Name="Value"
-      Type="float" />
+      Type="float"
+      Value="0" />
   </Node>
   <Node
     Id="1BB390C2"
     Type="AddFloat"
     Designer.Name="1bb390c2"
-    A="0"
-    B="7.2"
-    C="0"
     Designer.OffsetX="738"
     Designer.OffsetY="203.04">
     <Property
       Name="A"
-      Type="float" />
+      Type="float"
+      Value="0" />
     <Property
       Name="B"
-      Type="float" />
+      Type="float"
+      Value="7.2" />
     <Property
       Name="C"
-      Type="float" />
+      Type="float"
+      Value="0" />
   </Node>
   <Connection
     Source="1A620A72.In"
     Target="1A2EABBF.Out"
     Type="Element" />
   <Connection
-    Source="1A2D20E7.A"
-    Target="1A620A72.Value"
+    Source="1A2D20E7.A.0"
+    Target="1A620A72.Value.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />
@@ -97,8 +102,8 @@
     Target="1AE4B071.Out"
     Type="Element" />
   <Connection
-    Source="1BB390C2.A"
-    Target="1AE4B071.Value"
+    Source="1BB390C2.A.0"
+    Target="1AE4B071.Value.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />

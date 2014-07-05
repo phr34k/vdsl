@@ -589,5 +589,15 @@
     <Signal Name="Out" Type="Out"  />
   </Node>
 
+  
+  <Node Name="GFXCall" Color="LimeGreen" Category="Experimental">
+    <Member Name="Movie" Default="0" Type="int"/>
+    <Member Name="Variable" Default="" />
+    <Generator Name="Value" Default="0" Type="int" Types="float,int,bool" />
+    <Signal Name="In" Type="In" />
+    <Signal Name="Out" Type="Out"  />
+  </Node>
+  
+
 
 </Flow>

@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="Windows-1252"?>
-<Flow>
+<Flow
+  Version="2">
   <Node
     Id="198F83D1"
     Type="AddInt32"
     Designer.Name="198f83d1"
-    A="9"
-    B="5"
-    C="0"
     Designer.OffsetX="404"
-    Designer.OffsetY="203.04" />
+    Designer.OffsetY="203.04">
+    <Property
+      Name="A"
+      Type="int"
+      Value="9" />
+    <Property
+      Name="B"
+      Type="int"
+      Value="5" />
+    <Property
+      Name="C"
+      Type="int"
+      Value="0" />
+  </Node>
   <Node
     Id="1A1C7F74"
     Type="Signal"

@@ -1165,5 +1165,27 @@ namespace flow {
 		};
 	};
 
+	struct GFXCall
+	{
+	
+		enum
+		{
+			SymbolId = 0x0033
+		};
+	
+		struct Internal;
+		friend Internal;
+	
+		struct Properties
+		{
+			enum
+			{
+				Movie,
+				Variable,
+				Max,
+			};
+		};
+	};
+
 
 }

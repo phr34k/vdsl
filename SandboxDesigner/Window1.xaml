@@ -354,12 +354,13 @@
                         <Setter Property="Template" Value="{StaticResource NormalDesignerTemplate}" />
                         <Setter Property="MinWidth" Value="150" />
                         <Setter Property="MinHeight" Value="30" />
+                        
 
                         <Setter Property="Background">
                             <Setter.Value>
-                                <LinearGradientBrush>
-                                    <GradientStop Color="LightGray" Offset="0.0" />
-                                    <GradientStop Color="LightSlateGray" Offset="1" />
+                                <LinearGradientBrush Opacity="0.7">
+                                    <GradientStop Color="Black" Offset="0.0" />
+                                    <!--<GradientStop Color="LightSlateGray" Offset="1" />-->
                                 </LinearGradientBrush>
                             </Setter.Value>
                         </Setter>
@@ -384,6 +385,7 @@
                                 <ControlTemplate TargetType="{x:Type s:DesignerContextMenu}">
                                     <Border x:Name="Border" Background="{TemplateBinding Control.Background}" BorderBrush="{TemplateBinding Control.BorderBrush}" BorderThickness="{TemplateBinding Control.BorderThickness}">
                                         <StackPanel KeyboardNavigation.DirectionalNavigation="Cycle">
+                                            <ItemsPresenter />
                                             <TextBox Background="Transparent" FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" MinWidth="200" 
                                                      x:Name="Part_UINodeFilter" 
                                                      Focusable="True" KeyboardNavigation.DirectionalNavigation="None" />
@@ -392,7 +394,7 @@
                                                                   VerticalScrollBarVisibility="Visible" >
                                                 <!-- <StackPanel IsItemsHost="True" /> -->
 
-                                                <TreeView ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType={x:Type s:DesignerContextMenu}}}"
+                                                <TreeView ItemsSource="{Binding Templates, RelativeSource={RelativeSource AncestorType={x:Type s:DesignerContextMenu}}}"
                                                             x:Name="Part_TreeView" >
                                                     <TreeView.Resources>
                                                         <ControlTemplate TargetType="{x:Type TreeViewItem}" x:Key="TreeViewItemTemplate">

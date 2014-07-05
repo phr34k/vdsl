@@ -1,0 +1,583 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Aurora.SandboxDesigner.App" Collapsed="true">
+    <Position X="14.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Window1" Collapsed="true">
+    <Position X="14.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAEAAABgQAAAAAQAAAAQAAAACAIAAA=</HashCode>
+      <FileName>Window1.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.DebugCommands" Collapsed="true">
+    <Position X="6" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>Window1.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.CurveKey" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="16.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAQgkAQAIBAAAQAAAoEAAAAgAAAAAjA=</HashCode>
+      <FileName>Controls\AnimationDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.CurveKeyCollection" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="18.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AGIAAAABAAAAABAQCAIABAQAAAAAAAAASAAAAABQIBA=</HashCode>
+      <FileName>Controls\AnimationDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.Curve" Collapsed="true">
+    <Position X="14.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAIAAAACgAAAgAYAAAAAAAAAkAAMAAAABA=</HashCode>
+      <FileName>Controls\AnimationDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.AnimationChannel" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAACAAAAAAAAAAgAAAAYAkACAACCIAAAgiAAAAAA=</HashCode>
+      <FileName>Controls\AnimationDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.AnimationEditorGrid" Collapsed="true">
+    <Position X="9.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\AnimationDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.AnimationTimeIndicator" Collapsed="true">
+    <Position X="13" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAACAAAQAAAAAABIQAAAEQFEAAAAAAAAgIAAIgAA=</HashCode>
+      <FileName>Controls\AnimationDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.AnimationEditor" Collapsed="true">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAIQAKyAAABAEQQIACAAABBKACAAAIAQgxIAAAwAGIA=</HashCode>
+      <FileName>Controls\AnimationDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.AnimationKeyFrameRuler" Collapsed="true">
+    <Position X="11.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAgAAAAAAAjIAAABEQREAIAQAAIAgIAAIgAA=</HashCode>
+      <FileName>Controls\AnimationDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.EditableTextBlock" Collapsed="true">
+    <Position X="14.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAgAAAAAAAAAAAAAAAAAQIQAAICARAACAAAA=</HashCode>
+      <FileName>Controls\EditableTextBlock.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.EditableTextBlockAdorner" Collapsed="true">
+    <Position X="16.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAIAAAAAAAAAAEAIAAAAAIAQAEAAAAAAAAABIACAAAA=</HashCode>
+      <FileName>Controls\EditableTextBlock.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.LinkEventArgs" Collapsed="true">
+    <Position X="3.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAACAAAAAAAAAACAAAAgAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.LinkCanEstablishEventArgs" Collapsed="true">
+    <Position X="3.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.BooleanBoxes" Collapsed="true">
+    <Position X="16.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAAAAAAAAAAIAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerScrollViewer" Collapsed="true">
+    <Position X="9.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>RCICAAAAIAAAAAAAAAAYAAAAAAgSAAAAAAAAAgCAAEI=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerCanvasCommands" Collapsed="true">
+    <Position X="9.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACAAAEEQBAhAAAgAAABAAAAAAAAAAAAAAAAQAgAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.RangeObservableCollection&lt;T&gt;" Collapsed="true">
+    <Position X="7.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAABAAAAAAABAAAAAAAAAEAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerCanvas" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hEQTsQCAQUBREFAIMSASCiUEARFAAEEBQBIAPCQQnmA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerConnectionVisual" Collapsed="true">
+    <Position X="18.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerConnectionPresenter" Collapsed="true">
+    <Position X="16.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAgFAAAAQAIAAAAAABIAAIAQAAAAABAEIAAAIAAgAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerAdorner" Collapsed="true">
+    <Position X="7.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerTransformConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="11.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerTransformConverter2" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="13" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerConnection" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="13" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACCBAAAAhAUgAo+AAQEBgAChAAAAAMEACACggIFACg=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerComment" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="11.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAEAgQAEAAAkAAQQAAkAQAAAAAAIAAAAAAAAgI=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerItem" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AoEgAAAAAgRAEIAAgAQYQABEAQAIAAABKAAAEAAgAgI=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.Connector" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="11.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAgAEAAAAIAAAAggAAAIAAcgBQIAAAEAAAAAAAABAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.MoveThumb" Collapsed="true">
+    <Position X="16.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAEAAAAAEAEAEAAAgAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.PathFinder" Collapsed="true">
+    <Position X="18.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerConnectionAdorner" Collapsed="true">
+    <Position X="14.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAMAAAAAAAIAQAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.ConnectorAdorner" Collapsed="true">
+    <Position X="13" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAQAAAAACAAAABAAAAQAAAAgIAIGAAI=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.SelectionAdorner" Collapsed="true">
+    <Position X="13" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAQAAAAAIAAAAACAAAABAAAAAAAAAgIAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.BooleanToVisibilityConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.Extensions" Collapsed="true">
+    <Position X="6" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphSocket" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAAAAQAAAAEAAAAAQACAAAAAhA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphProperty" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="18.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAEGAAQAAAAAIAAAAAAQAAAABACAAAQAgAAAAABA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphNodeItem" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="13" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAIEAAACAAAAABIAAAAQCAQA0CAEAQCoAQAJAAECDAA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphType" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAQAAAAAQAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphEnumType" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAQAAAAAQAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphViewItem" Collapsed="true">
+    <Position X="13" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAACAAAAAAAAAQAAAAAAAAAAQAAAIAAAAA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.DesignerContextMenu" Collapsed="true">
+    <Position X="6" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphNodeDiagramDesignerCommands" Collapsed="true">
+    <Position X="11.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphNodeDiagramDesigner" Collapsed="true">
+    <Position X="0.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgIAAAABAAAAAAggAAAAESAAAAAEFCAAAAABACAg=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphNodeItemContainerStyleSelector" Collapsed="true">
+    <Position X="14.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphNodeParameterTemplateSelector" Collapsed="true">
+    <Position X="16.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAEAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphEnumConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAIABAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphPropertySelector" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.GraphTypesVisibillitySelector" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="11.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.MouseDoubleClick" Collapsed="true">
+    <Position X="14.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIgIAAAAAAAAAAAAAAAAAIQAAAAAAAAAAAAAABAAAQA=</HashCode>
+      <FileName>Controls\MouseDoubleClick.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.ResizeableCanvas" Collapsed="true">
+    <Position X="9.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAOAAAAQAAAAIAAiAAIgAAQAEABAAAACAAAEAAAAAA=</HashCode>
+      <FileName>Controls\ResizeableCanvas.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.Vector1" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAEQAAAAAAAAAQAgAAAAAAAMAAACAAAAAA=</HashCode>
+      <FileName>Controls\Vector3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.Vector2" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAGQAAAAAAAAAYAgAAAAAAAMAAACAAAAAA=</HashCode>
+      <FileName>Controls\Vector3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.Vector3" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAHQAAAAAAAAAcAgAAAAAAAMAAACAAAAAA=</HashCode>
+      <FileName>Controls\Vector3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.Vector4" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="11.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAgHQAAAAAAACAcAgAAAAAAAMAAACAAAAAA=</HashCode>
+      <FileName>Controls\Vector3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.TextField" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="16.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAgAAAAAAAMAAACAAAAAA=</HashCode>
+      <FileName>Controls\Vector3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.EnumField" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="18.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAhAAAAAAAMAAACIAAAAA=</HashCode>
+      <FileName>Controls\Vector3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.BooleanField" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="18.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAgAAAAAAAMAAACAAAAAA=</HashCode>
+      <FileName>Controls\Vector3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.BooleanFieldDisplayConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\Vector3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.BooleanFieldValueConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\Vector3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Controls.VirtualizingTilePanel" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="13" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAMgIACBAAACAAIIQEIAEcRCASYEYwAABABQAQFsIA=</HashCode>
+      <FileName>Controls\VirtualizingTilePanel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Internals.PathHelper" Collapsed="true">
+    <Position X="6" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Internals\PathHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Internals.UIHelper" Collapsed="true">
+    <Position X="18.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAEAAAAAAAAAAA=</HashCode>
+      <FileName>Internals\UIHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Properties.Resources" Collapsed="true">
+    <Position X="11.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aurora.SandboxDesigner.Properties.Settings" Collapsed="true">
+    <Position X="14.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQIAAAAAABAAAAgAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Aurora.SandboxDesigner.Controls.IDesignerElement" Collapsed="true">
+    <Position X="9.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Aurora.SandboxDesigner.Controls.ICloneable&lt;T&gt;" Collapsed="true">
+    <Position X="7.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Aurora.SandboxDesigner.Controls.GraphIType" Collapsed="true">
+    <Position X="6" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAQAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="Aurora.SandboxDesigner.Controls.CurveLoopType" Collapsed="true">
+    <Position X="9.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAACAAAAAAAAAAAABAAAAAAgAAQAAAAAAAAA=</HashCode>
+      <FileName>Controls\AnimationDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Aurora.SandboxDesigner.Controls.CurveTangent" Collapsed="true">
+    <Position X="11.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAgAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\AnimationDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Aurora.SandboxDesigner.Controls.CurveContinuity" Collapsed="true">
+    <Position X="7.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>Controls\AnimationDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Aurora.SandboxDesigner.Controls.ConnectorGroups" Collapsed="true">
+    <Position X="6" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Aurora.SandboxDesigner.Controls.GraphSocketSlot" Collapsed="true">
+    <Position X="13" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>Controls\GraphNodeDiagramDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Delegate Name="Aurora.SandboxDesigner.Controls.TimeChangedEventHandler" Collapsed="true">
+    <Position X="13" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAACAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\AnimationDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="Aurora.SandboxDesigner.Controls.LinkCanEstablishEventHandler" Collapsed="true">
+    <Position X="7.75" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="Aurora.SandboxDesigner.Controls.LinkChangedEventHandler" Collapsed="true">
+    <Position X="9.5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="Aurora.SandboxDesigner.Controls.LinkPriorityChangedEventHandler" Collapsed="true">
+    <Position X="11.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAACAAAAAAAQAAAABAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="Aurora.SandboxDesigner.Controls.ItemDoubleClickedEventHandler" Collapsed="true">
+    <Position X="6" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Controls\GraphDesigner.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

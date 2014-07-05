@@ -23,6 +23,8 @@ namespace Aurora.SandboxDesigner
     {
         public Window1()
         {
+            this.Loaded += Window1_Loaded;
+            this.Initialized += Window1_Initialized;
             InitializeComponent();
             canvas1.Header = "Untitled document";
             this.CommandBindings.Add( new CommandBinding( ApplicationCommands.Open,
@@ -33,6 +35,35 @@ namespace Aurora.SandboxDesigner
                 NewCmdExecuted, NewCmdCanExecute));
             this.CommandBindings.Add(new CommandBinding(DebugCommands.Start,
                 StartCmdExecuted, StartCmdCanExecute));
+            
+        }
+
+        void Window1_Initialized(object sender, EventArgs e)
+        {
+
+        }
+
+        void Window1_Loaded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.BeginInvoke( (Action)delegate() {
+                string[] args = Environment.GetCommandLineArgs();
+                if (args.Length == 2)
+                {
+                    try
+                    {
+                        using (FileStream s = File.OpenRead(args[1]))
+                        {
+                            canvas1.Header = args[1];
+                            canvas1.Clear();
+                            canvas1.Load(s);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Unexpected error occured");
+                    }
+                }
+            } );
         }
 
         void NewCmdExecuted(object target, ExecutedRoutedEventArgs e)
@@ -58,7 +89,7 @@ namespace Aurora.SandboxDesigner
             try
             {
                 Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
-                dialog.Filter = "*.xml|*.xml";
+                dialog.Filter = "*.flow|*.flow";
                 if (dialog.ShowDialog() == true) 
                 {
                     try
@@ -127,7 +158,7 @@ namespace Aurora.SandboxDesigner
             try
             {
                 Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
-                dialog.Filter = "*.xml|*.xml";
+                dialog.Filter = "*.flow|*.flow";
                 if (dialog.ShowDialog() == true)
                 {
                     try

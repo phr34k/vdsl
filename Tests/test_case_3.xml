@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Flow
+  Version="2">
+  <Node
+    Id="1ADD0DCD"
+    Type="GFXCall"
+    Designer.Name="1add0dcd"
+    Designer.OffsetX="656"
+    Designer.OffsetY="259.04">
+    <Property
+      Name="Movie"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Variable" />
+    <Property
+      Name="Value"
+      Type="int"
+      Value="22" />
+    <Property
+      Name="Value"
+      Type="int"
+      Value="24" />
+    <Property
+      Name="Value"
+      Type="int"
+      Value="12" />
+    <Property
+      Name="Value"
+      Type="int"
+      Value="14" />
+    <Property
+      Name="Value"
+      Type="int"
+      Value="0" />
+  </Node>
+  <Node
+    Id="1A9ACEC7"
+    Type="Signal"
+    Designer.Name="Execute"
+    Designer.OffsetX="403"
+    Designer.OffsetY="344.04" />
+  <Node
+    Id="1AEDF6A4"
+    Type="AddInt32"
+    Designer.Name="1aedf6a4"
+    Designer.OffsetX="908"
+    Designer.OffsetY="289.04">
+    <Property
+      Name="A"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="B"
+      Type="int"
+      Value="5" />
+    <Property
+      Name="C"
+      Type="int"
+      Value="0" />
+  </Node>
+  <Connection
+    Source="1ADD0DCD.In"
+    Target="1A9ACEC7.Out"
+    Type="Element" />
+  <Connection
+    Source="1AEDF6A4.In"
+    Target="1ADD0DCD.Out"
+    Type="Element" />
+  <Connection
+    Source="1AEDF6A4.B.0"
+    Target="1ADD0DCD.Value.1"
+    SourceType="In"
+    TargetType="Out"
+    Type="Property" />
+  <Connection
+    Source="1AEDF6A4.A.0"
+    Target="1ADD0DCD.Value.0"
+    SourceType="In"
+    TargetType="Out"
+    Type="Property" />
+</Flow>

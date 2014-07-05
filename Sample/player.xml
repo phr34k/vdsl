@@ -1,26 +1,42 @@
 <?xml version="1.0" encoding="Windows-1252"?>
-<Flow>
+<Flow
+  Version="2">
   <Node
     Id="16B35666"
     Type="KeyPressed"
     Designer.Name="16b35666"
-    Key="Space"
     Designer.OffsetX="88"
-    Designer.OffsetY="363.04" />
+    Designer.OffsetY="363.04">
+    <Property
+      Name="Key"
+      Type="TypeKeyPressed"
+      Value="Space" />
+  </Node>
   <Node
     Id="1758CD83"
     Type="CompareInt32"
     Designer.Name="1758cd83"
-    A="0"
-    B="1"
-    Designer.OffsetX="529"
-    Designer.OffsetY="365.04" />
+    Designer.OffsetX="521"
+    Designer.OffsetY="229.04">
+    <Property
+      Name="A"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="B"
+      Type="int"
+      Value="1" />
+  </Node>
   <Node
     Id="17B2CC9F"
     Type="QueryMenuState"
     Designer.Name="17b2cc9f"
     Designer.OffsetX="85"
-    Designer.OffsetY="106.04" />
+    Designer.OffsetY="106.04">
+    <Property
+      Name="Value"
+      Type="int" />
+  </Node>
   <Node
     Id="16B6CA18"
     Type="UseWeapon"
@@ -31,36 +47,68 @@
     Id="180FAB44"
     Type="CompareInt32"
     Designer.Name="180fab44"
-    A="0"
-    B="1"
     Designer.OffsetX="297"
-    Designer.OffsetY="185.04" />
+    Designer.OffsetY="185.04">
+    <Property
+      Name="A"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="B"
+      Type="int"
+      Value="1" />
+  </Node>
   <Node
     Id="1FE39BC2"
     Type="Spawn"
     Designer.Name="1fe39bc2"
-    SpawnClass="enemy_05_ur"
-    SpawnScale="1 1 1"
-    SpawnOrientation="0 0 0 1"
-    SpawnPoint="3136 214 0"
     Designer.OffsetX="2476.49687385068"
-    Designer.OffsetY="2329.76507539537" />
+    Designer.OffsetY="2329.76507539537">
+    <Property
+      Name="SpawnClass"
+      Value="enemy_05_ur" />
+    <Property
+      Name="SpawnScale"
+      Type="vector3"
+      Value="1 1 1" />
+    <Property
+      Name="SpawnOrientation"
+      Type="quaternion"
+      Value="0 0 0 1" />
+    <Property
+      Name="SpawnPoint"
+      Type="vector3"
+      Value="3136 214 0" />
+  </Node>
   <Node
     Id="1893C15A"
     Type="KeyPressed"
     Designer.Name="1893c15a"
-    Key="M"
     Designer.OffsetX="91"
-    Designer.OffsetY="538.04" />
+    Designer.OffsetY="538.04">
+    <Property
+      Name="Key"
+      Type="TypeKeyPressed"
+      Value="M" />
+  </Node>
   <Node
     Id="191C6200"
     Type="GFXSetVariable"
     Designer.Name="191c6200"
-    Movie="0"
-    Variable="health"
-    Value="50"
     Designer.OffsetX="500"
-    Designer.OffsetY="737.04" />
+    Designer.OffsetY="737.04">
+    <Property
+      Name="Movie"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Variable"
+      Value="health" />
+    <Property
+      Name="Value"
+      Type="int"
+      Value="50" />
+  </Node>
   <Node
     Id="19F091EE"
     Type="Signal"
@@ -71,28 +119,54 @@
     Id="1A4181EB"
     Type="ChangeHealth"
     Designer.Name="1a4181eb"
-    Unit="0"
-    Amount="20"
     Designer.OffsetX="307"
-    Designer.OffsetY="575.04" />
+    Designer.OffsetY="575.04">
+    <Property
+      Name="Unit"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Amount"
+      Type="int"
+      Value="20" />
+  </Node>
   <Node
     Id="19EE8EA9"
     Type="QueryHealthOfUnit"
     Designer.Name="19ee8ea9"
-    Unit="0"
-    Current="0"
-    Maximum="0"
     Designer.OffsetX="307"
-    Designer.OffsetY="737.04" />
+    Designer.OffsetY="737.04">
+    <Property
+      Name="Unit"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Current"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Maximum"
+      Type="int"
+      Value="0" />
+  </Node>
   <Node
     Id="1C2443F1"
     Type="GFXSetVariable"
     Designer.Name="1c2443f1"
-    Movie="0"
-    Variable="gameover"
-    Value="1"
     Designer.OffsetX="303"
-    Designer.OffsetY="921.95930795848" />
+    Designer.OffsetY="921.95930795848">
+    <Property
+      Name="Movie"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Variable"
+      Value="gameover" />
+    <Property
+      Name="Value"
+      Type="int"
+      Value="1" />
+  </Node>
   <Node
     Id="1D53EAAE"
     Type="Signal"
@@ -103,34 +177,61 @@
     Id="19A1C59E"
     Type="CompareInt32"
     Designer.Name="19a1c59e"
-    A="0"
-    B="0"
     Designer.OffsetX="1237"
-    Designer.OffsetY="123.04" />
+    Designer.OffsetY="123.04">
+    <Property
+      Name="A"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="B"
+      Type="int"
+      Value="0" />
+  </Node>
   <Node
     Id="1A368D86"
     Type="GFXGetVariable"
     Designer.Name="1a368d86"
-    Movie="0"
-    Variable="gameover"
-    Value="0"
     Designer.OffsetX="515"
-    Designer.OffsetY="60.04" />
+    Designer.OffsetY="60.04">
+    <Property
+      Name="Movie"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Variable"
+      Value="gameover" />
+    <Property
+      Name="Value"
+      Type="int"
+      Value="0" />
+  </Node>
   <Node
     Id="1A8BE14D"
     Type="CompareInt32"
     Designer.Name="1a8be14d"
-    A="0"
-    B="0"
     Designer.OffsetX="1246"
-    Designer.OffsetY="400.04" />
+    Designer.OffsetY="400.04">
+    <Property
+      Name="A"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="B"
+      Type="int"
+      Value="0" />
+  </Node>
   <Node
     Id="1B6473B8"
     Type="ChangeMenuState"
     Designer.Name="1b6473b8"
-    StateId="3"
     Designer.OffsetX="1475"
-    Designer.OffsetY="397.04" />
+    Designer.OffsetY="397.04">
+    <Property
+      Name="StateId"
+      Type="int"
+      Value="3" />
+  </Node>
   <Node
     Id="1A9946D5"
     Type="Signal"
@@ -141,20 +242,53 @@
     Id="1B571A34"
     Type="GFXGetVariable"
     Designer.Name="1b571a34"
-    Movie="0"
-    Variable="gamewon"
-    Value="0"
     Designer.OffsetX="740.883835279656"
-    Designer.OffsetY="153.04" />
+    Designer.OffsetY="153.04">
+    <Property
+      Name="Movie"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Variable"
+      Value="gamewon" />
+    <Property
+      Name="Value"
+      Type="int"
+      Value="0" />
+  </Node>
   <Node
     Id="1BA46900"
     Type="AddInt32"
     Designer.Name="1ba46900"
-    A="0"
-    B="0"
-    C="0"
     Designer.OffsetX="974.883835279656"
-    Designer.OffsetY="92.04" />
+    Designer.OffsetY="92.04">
+    <Property
+      Name="A"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="B"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="C"
+      Type="int"
+      Value="0" />
+  </Node>
+  <Node
+    Id="1A9EB451"
+    Type="GFXCall"
+    Designer.Name="1a9eb451"
+    Designer.OffsetX="882.283653846154"
+    Designer.OffsetY="729.502692307692">
+    <Property
+      Name="Movie"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Variable"
+      Value="show_menu" />
+  </Node>
   <Connection
     Source="1758CD83.In"
     Target="16B35666.Released"
@@ -164,8 +298,8 @@
     Target="16B35666.Pressed"
     Type="Element" />
   <Connection
-    Source="180FAB44.A"
-    Target="17B2CC9F.Value"
+    Source="180FAB44.A.0"
+    Target="17B2CC9F.Value.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />
@@ -182,8 +316,8 @@
     Target="19F091EE.Out"
     Type="Element" />
   <Connection
-    Source="191C6200.Value"
-    Target="19EE8EA9.Current"
+    Source="191C6200.Value.0"
+    Target="19EE8EA9.Current.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />
@@ -200,8 +334,8 @@
     Target="180FAB44.A == B"
     Type="Element" />
   <Connection
-    Source="1758CD83.A"
-    Target="180FAB44.A"
+    Source="1758CD83.A.0"
+    Target="180FAB44.A.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />
@@ -210,14 +344,14 @@
     Target="1A9946D5.Out"
     Type="Element" />
   <Connection
-    Source="1BA46900.A"
-    Target="1A368D86.Value"
+    Source="1BA46900.A.0"
+    Target="1A368D86.Value.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />
   <Connection
-    Source="1BA46900.B"
-    Target="1B571A34.Value"
+    Source="1BA46900.B.0"
+    Target="1B571A34.Value.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />
@@ -226,14 +360,14 @@
     Target="1A368D86.Out"
     Type="Element" />
   <Connection
-    Source="19A1C59E.A"
-    Target="1BA46900.C"
+    Source="19A1C59E.A.0"
+    Target="1BA46900.C.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />
   <Connection
-    Source="1A8BE14D.A"
-    Target="1BA46900.C"
+    Source="1A8BE14D.A.0"
+    Target="1BA46900.C.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />
@@ -256,5 +390,9 @@
   <Connection
     Source="19A1C59E.In"
     Target="1BA46900.Out"
+    Type="Element" />
+  <Connection
+    Source="1A9EB451.In"
+    Target="191C6200.Out"
     Type="Element" />
 </Flow>

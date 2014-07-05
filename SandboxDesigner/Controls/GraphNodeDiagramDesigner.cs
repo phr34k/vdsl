@@ -24,6 +24,10 @@ namespace Aurora.SandboxDesigner.Controls
         {
             return listToClone.Select(item => (T)item.Clone()).ToList();
         }
+        public static GraphNodeItem.PropertyList Clone(this GraphNodeItem.PropertyList listToClone) 
+        {
+            return new GraphNodeItem.PropertyList(listToClone.Select(item => (GraphProperty)item.Clone()));
+        }
     }
 
     [Serializable()]
@@ -184,6 +188,47 @@ namespace Aurora.SandboxDesigner.Controls
     [Serializable()]
     public class GraphNodeItem : System.ComponentModel.INotifyPropertyChanged, System.Runtime.Serialization.IDeserializationCallback
     {
+        public class PropertyList : List<GraphProperty>, System.Collections.Specialized.INotifyCollectionChanged
+        {
+
+            #region INotifyCollectionChanged Members
+
+            public event System.Collections.Specialized.NotifyCollectionChangedEventHandler CollectionChanged;
+
+            #endregion
+
+
+
+            public void Added(GraphProperty added)
+            {                
+                if( CollectionChanged != null ) 
+                {
+                    var x = new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Add, added);
+                    CollectionChanged.Invoke(this, x);
+                }
+            }
+
+            public void Removed(GraphProperty added)
+            {
+                if (CollectionChanged != null)
+                {
+                    var x = new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Remove, added);
+                    CollectionChanged.Invoke(this, x);
+                }
+            }
+
+            public PropertyList()
+            {
+
+            }
+
+            public PropertyList(IEnumerable<GraphProperty> d)
+            {                
+                AddRange(d);
+            }
+        };
+
+
         #region Private Members
 
         private static Random serialRandomizer = new Random();
@@ -202,7 +247,7 @@ namespace Aurora.SandboxDesigner.Controls
 
         public uint NodeId;
         public List<GraphSocket> Socket = new List<GraphSocket>();
-        public List<GraphProperty> properties = new List<GraphProperty>();
+        public PropertyList properties = new PropertyList();
 
         public string Name
         {
@@ -233,6 +278,11 @@ namespace Aurora.SandboxDesigner.Controls
         {
             get { return shape; }
             set { shape = value; }
+        }
+
+        public GraphProperty Generator
+        {
+            get; set;
         }
 
         public SolidColorBrush Brush
@@ -398,7 +448,13 @@ namespace Aurora.SandboxDesigner.Controls
         {
             get { return InsertPosition; }
             set { InsertPosition = value; }
-        }        
+        }
+
+        public System.Collections.IEnumerable Templates
+        {
+            get;
+            set;
+        }
     };
 
 
@@ -423,6 +479,7 @@ namespace Aurora.SandboxDesigner.Controls
         {
             public GraphSocketSlot Slot { get; set; }
             public string Name { get; set; }
+            public int Offset { get; set; }
         }
        
         public struct Database
@@ -613,9 +670,11 @@ namespace Aurora.SandboxDesigner.Controls
 
 
             this.ItemContainerStyleSelector = new GraphNodeItemContainerStyleSelector();
-            this.ContextMenu = new DesignerContextMenu();
-            this.ContextMenu.ItemsSource = items.Items.View;
-            this.ContextMenu.Opened += new RoutedEventHandler(ContextMenu_Opened);
+            var menu = new DesignerContextMenu();
+            menu.Templates = items.Items.View;
+            menu.Opened += new RoutedEventHandler(ContextMenu_Opened);
+
+            this.ContextMenu = menu;
             DesignerDatabase = database;
         }
 
@@ -676,7 +735,8 @@ namespace Aurora.SandboxDesigner.Controls
                                     item.Typename = header;
                                     item.Shape = templateItem.Shape;
                                     item.Brush = templateItem.Brush;
-                                    item.properties = templateItem.properties.Clone();
+                                    item.Generator = templateItem.Generator;
+                                    item.properties = new Aurora.SandboxDesigner.Controls.GraphNodeItem.PropertyList( templateItem.properties.Clone() );
                                     for (int i = 0; i < item.properties.Count; i++)
                                         item.properties[i].Owner = item;
                                     item.Socket = templateItem.Socket.Clone();
@@ -709,6 +769,65 @@ namespace Aurora.SandboxDesigner.Controls
 
         void ContextMenu_Opened(object sender, RoutedEventArgs e)
         {
+
+
+            (sender as DesignerContextMenu).Items.Clear();
+            if (this.SelectedItem != null)
+            {
+                GraphNodeItem item = SelectedItem as GraphNodeItem;
+                var menu = sender as DesignerContextMenu;
+                if (menu != null && item.Generator != null)
+                {
+                    var menuItem = new MenuItem() { Header = "Add " + item.Generator.Name };
+                    menuItem.Click += delegate(object senderr, RoutedEventArgs er)
+                    {                        
+                        if (item != null && item.Generator != null)
+                        {
+                            DesignerItem designerItem = (ItemContainerGenerator.ContainerFromItem(item) as DesignerItem);
+                            var x = item.Generator.Clone();
+                            item.properties.Add(x);
+                            item.properties.Added(x);
+                            item.RaisePropertyChanged("Properties");
+                        }
+                    };
+
+
+                    //menu.ItemsSource = items.Items.View;
+                    menu.Items.Add(menuItem);
+
+
+                    var menuItem1 = new MenuItem() { Header = "Remove " + item.Generator.Name };
+                    menuItem1.Click += delegate(object senderr, RoutedEventArgs er)
+                    {
+                        if (item != null && item.Generator != null)
+                        {
+                            DesignerItem designerItem = (ItemContainerGenerator.ContainerFromItem(item) as DesignerItem);
+                            var x = item.properties.Last();
+                            var connIn = FromNode(item, x, GraphSocketSlot.In);
+                            var connOut = FromNode(item, x, GraphSocketSlot.Out);
+                            foreach (var conn in MyConnections.ToArray())
+                            {
+                                if (conn.Source == connIn || conn.Sink == connOut)
+                                {
+                                    MyConnections.Remove(conn);
+                                }
+                            }
+
+                            item.properties.Remove(x);
+                            item.properties.Removed(x);
+                            item.RaisePropertyChanged("Properties");
+                        }
+                    };
+
+
+                    //menu.ItemsSource = items.Items.View;
+                    menu.Items.Add(menuItem1);  
+                }                 
+            }
+
+
+
+
             if (CommandBindings.Count == 0)
             {
                 CommandBinding b = new CommandBinding();
@@ -919,6 +1038,44 @@ namespace Aurora.SandboxDesigner.Controls
                                     enumType[name] = uint.Parse(type);
                             }
                         }
+                        else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Generator")
+                        {
+                            if (item != null)
+                            {
+                                string name = reader.GetAttribute("Name");
+                                string value = reader.GetAttribute("Default");
+                                string type = reader.GetAttribute("Type");
+                                string visible = reader.GetAttribute("Visible");
+                                string[] types = (reader.GetAttribute("Types") == null ? string.Empty : reader.GetAttribute("Types")).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                
+
+
+                                if (string.IsNullOrEmpty(visible) && visible != "Hidden")
+                                {
+                                    object typeInformation = null;
+                                    if (!string.IsNullOrEmpty(type)) designerDatabase.Types.TryGetValue(type, out typeInformation);
+                                    GraphProperty p = new GraphProperty(item, name, value, typeInformation);                                    
+                                    if (types.Length > 0)
+                                    {
+                                        p.Types = new List<GraphIType>();
+                                        foreach (string x in types)
+                                            p.Types.Add(designerDatabase.Types[x] as GraphIType);
+                                    }
+                                    
+                                    //item.properties.Add(p);
+                                    item.Generator = p;                                    
+                                }                                
+                            }
+                            else if (enumType != null)
+                            {
+                                string name = reader.GetAttribute("Name");
+                                string type = reader.GetAttribute("Value");
+                                if( type.StartsWith("0x") )
+                                    enumType[name] = uint.Parse(type.Replace("0x",""), System.Globalization.NumberStyles.HexNumber);
+                                else
+                                    enumType[name] = uint.Parse(type);
+                            }
+                        }                        
                         else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Signal")
                         {
                             if (item != null)
@@ -976,6 +1133,7 @@ namespace Aurora.SandboxDesigner.Controls
                 BeginInit();
                 using (System.Xml.XmlTextReader reader = new System.Xml.XmlTextReader(stream))
                 {
+                    int version = 1;
                     List<KeyValuePair<KeyValuePair<uint, ConnectionPair>, KeyValuePair<uint, ConnectionPair>>> connectionPair =
                         new List<KeyValuePair<KeyValuePair<uint, ConnectionPair>, KeyValuePair<uint, ConnectionPair>>>();
                     Dictionary<uint, GraphNodeItem> nodeResolver = new Dictionary<uint, GraphNodeItem>();
@@ -983,6 +1141,13 @@ namespace Aurora.SandboxDesigner.Controls
                     {
                         if (reader.NodeType == XmlNodeType.XmlDeclaration)
                         {
+                        }
+                        else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Flow")
+                        {
+
+                            string v = reader.GetAttribute("Version");
+                            if (String.IsNullOrEmpty(v) == false)
+                                version = int.Parse(v);
                         }
                         else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Comment")
                         {
@@ -997,7 +1162,7 @@ namespace Aurora.SandboxDesigner.Controls
                                     comment.Loaded -= eh;
                                 };
 
-                                comment.Loaded += eh;                                                               
+                                comment.Loaded += eh;
                                 Items.Add(comment);
 
                                 if (string.IsNullOrEmpty(reader.GetAttribute("Designer.OffsetX")) == false)
@@ -1026,15 +1191,21 @@ namespace Aurora.SandboxDesigner.Controls
                                     item.Category = template.Category;
                                     item.Brush = template.Brush;
                                     item.Shape = template.Shape;
-                                    item.properties = template.properties.Clone();
                                     item.Socket = template.Socket.Clone();
-                                    for (int i = 0; i < item.properties.Count; i++)
+                                    item.properties = template.properties.Clone();
+                                    item.Generator = template.Generator;
+
+                                    if (version == 1)
                                     {
-                                        item.properties[i].Owner = item;
-                                        string value = reader.GetAttribute(item.properties[i].Name);
-                                        if (value != null)
-                                            item.properties[i].Value = value;
+                                        for (int i = 0; i < item.properties.Count; i++)
+                                        {
+                                            item.properties[i].Owner = item;
+                                            string value = reader.GetAttribute(item.properties[i].Name);
+                                            if (value != null)
+                                                item.properties[i].Value = value;
+                                        }
                                     }
+       
 
                                 }
                                 else
@@ -1043,7 +1214,7 @@ namespace Aurora.SandboxDesigner.Controls
                                 }
 
                                 nodeResolver[item.NodeId] = item;
-                                
+
                                 if (string.IsNullOrEmpty(reader.GetAttribute("Designer.OffsetX")) == false)
                                     canvasLeftLookup[item] = double.Parse(reader.GetAttribute("Designer.OffsetX"), System.Globalization.CultureInfo.InvariantCulture);
                                 if (string.IsNullOrEmpty(reader.GetAttribute("Designer.OffsetY")) == false)
@@ -1059,25 +1230,45 @@ namespace Aurora.SandboxDesigner.Controls
                         }
                         else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Property")
                         {
-                            GraphProperty property = item.properties.Where(x => x.Name == reader.GetAttribute("Name")).FirstOrDefault();
+                            GraphProperty property = null;
+                            string propName = reader.GetAttribute("Name");
+                            if (item.Generator != null && propName == item.Generator.Name)
+                            {
+                                property = item.Generator.Clone();
+                                item.properties.Add(property);
+                            }
+                            else
+                            {
+                                property = item.properties.Where(x => x.Name == propName).FirstOrDefault();         
+                            }
+
                             if (property != null && property.Types != null)
                             {
                                 string name = reader.GetAttribute("Type");
                                 var type = property.Types.Where(x => x.Name == name).FirstOrDefault();
-                                if (type != null) property.Type = type;                                
-                            }                            
+                                if (type != null) property.Type = type;
+                            }
+
+                            if (version == 2)
+                            {
+                                string value = reader.GetAttribute("Value");
+                                if( value != null )
+                                    property.Value = value;
+                            }
                         }
                         else if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "Node")
-                        {                            
+                        {
                             Items.Add(item);
                             item = null;
                         }
                         else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Connection")
                         {
-                            string[] source = reader.GetAttribute("Source").Split(new char[] { '.' }, 2, StringSplitOptions.RemoveEmptyEntries);
-                            string[] target = reader.GetAttribute("Target").Split(new char[] { '.' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                            string[] source = reader.GetAttribute("Source").Split(new char[] { '.' }, 3, StringSplitOptions.RemoveEmptyEntries);
+                            string[] target = reader.GetAttribute("Target").Split(new char[] { '.' }, 3, StringSplitOptions.RemoveEmptyEntries);
                             uint sourceComponent = uint.Parse(source[0], System.Globalization.NumberStyles.HexNumber);
                             uint targetComponent = uint.Parse(target[0], System.Globalization.NumberStyles.HexNumber);
+                            int sourceOffset = source.Length == 2 ? 0 : int.Parse(source[2]);
+                            int targetOffset = target.Length == 2 ? 0 : int.Parse(target[2]);
                             GraphSocketSlot sourceSlot = GraphSocketSlot.In;
                             GraphSocketSlot targetSlot = GraphSocketSlot.Out;
 
@@ -1110,8 +1301,8 @@ namespace Aurora.SandboxDesigner.Controls
 
                             connectionPair.Add(
                                 new KeyValuePair<KeyValuePair<uint, ConnectionPair>, KeyValuePair<uint, ConnectionPair>>(
-                                    new KeyValuePair<uint, ConnectionPair>(sourceComponent, new ConnectionPair() { Name = source[1], Slot = sourceSlot }),
-                                    new KeyValuePair<uint, ConnectionPair>(targetComponent, new ConnectionPair() { Name = target[1], Slot = targetSlot })
+                                    new KeyValuePair<uint, ConnectionPair>(sourceComponent, new ConnectionPair() { Name = source[1], Slot = sourceSlot, Offset = sourceOffset }),
+                                    new KeyValuePair<uint, ConnectionPair>(targetComponent, new ConnectionPair() { Name = target[1], Slot = targetSlot, Offset = targetOffset })
                                 )
                             );
                         }
@@ -1148,22 +1339,31 @@ namespace Aurora.SandboxDesigner.Controls
                                 if (targetItem.Socket[i].Name == pairs.Value.Value.Name)
                                     targetConnector = FromNode(targetItem, targetItem.Socket[i], pairs.Value.Value.Slot);
 
-                            for (int i = 0; i < souceItem.properties.Count; i++)
-                                if (souceItem.properties[i].Name == pairs.Key.Value.Name)
+                            for (int i = 0, x = 0; i < souceItem.properties.Count; i++)
+                                if (souceItem.properties[i].Name == pairs.Key.Value.Name && x++ == pairs.Key.Value.Offset)
                                     sourceConnector = FromNode(souceItem, souceItem.properties[i], pairs.Key.Value.Slot);
 
-                            for (int i = 0; i < targetItem.properties.Count; i++)
-                                if (targetItem.properties[i].Name == pairs.Value.Value.Name)
+                            for (int i = 0, x = 0; i < targetItem.properties.Count; i++)
+                                if (targetItem.properties[i].Name == pairs.Value.Value.Name && x++ == pairs.Value.Value.Offset)
                                     targetConnector = FromNode(targetItem, targetItem.properties[i], pairs.Value.Value.Slot);
 
-                            DesignerConnection dcon = new DesignerConnection()
-                            {
-                                Source = sourceConnector,
-                                Sink = targetConnector
-                            };
+                            
 
-                            mconnections.Add(dcon);
-                            //ConnectionLayer.Children.Add(dcon);
+                            if (sourceConnector == null || targetConnector == null)
+                            {
+                                System.Diagnostics.Debugger.Break();
+                            }
+                            else
+                            {
+                                DesignerConnection dcon = new DesignerConnection()
+                                {
+                                    Source = sourceConnector,
+                                    Sink = targetConnector
+                                };
+
+                                mconnections.Add(dcon);
+                                //ConnectionLayer.Children.Add(dcon);
+                            }
                         }
                         else
                         {
@@ -1201,6 +1401,7 @@ namespace Aurora.SandboxDesigner.Controls
                 
                 writer.WriteStartDocument();
                 writer.WriteStartElement("Flow");
+                writer.WriteAttributeString("Version", "2");
 
 
                 foreach (DesignerComment item in Items.OfType<DesignerComment>())
@@ -1216,32 +1417,56 @@ namespace Aurora.SandboxDesigner.Controls
                 foreach (GraphNodeItem item in Items.OfType<GraphNodeItem>())
                 {
                     DesignerItem designerItem = ItemContainerGenerator.ContainerFromItem(item) as DesignerItem;
+                    if (designerItem == null)
+                        continue;
 
                     writer.WriteStartElement("Node");
                     writer.WriteAttributeString("Id", item.NodeId.ToString("X"));
                     writer.WriteAttributeString("Type", item.Typename);
                     writer.WriteAttributeString("Designer.Name", string.IsNullOrEmpty(item.Name) ? "" : item.Name);
-
-                    foreach (GraphProperty prop in item.properties)
-                    {
-                        if( string.IsNullOrEmpty(prop.Value) == false )
-                            writer.WriteAttributeString(prop.Name, prop.Value);                        
-                    }
-
-
                     writer.WriteAttributeString("Designer.OffsetX", ResizeableCanvas.GetLeft(designerItem).ToString(System.Globalization.CultureInfo.InvariantCulture));
                     writer.WriteAttributeString("Designer.OffsetY", ResizeableCanvas.GetTop(designerItem).ToString(System.Globalization.CultureInfo.InvariantCulture));
 
-                    foreach (GraphProperty prop in item.properties)
+                    /*
+                    try
                     {
-                        if (prop.Type != null )
+                        foreach (GraphProperty prop in item.properties)
                         {
-                            writer.WriteStartElement("Property");
-                            writer.WriteAttributeString("Name", prop.Name );
-                            writer.WriteAttributeString("Type", (prop.Type as GraphIType).Name);
-                            writer.WriteEndElement();
+                            if (string.IsNullOrEmpty(prop.Value) == false)
+                                writer.WriteAttributeString(prop.Name, prop.Value);
                         }
-                    }                    
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                    */
+
+                    try
+                    {
+                        foreach (GraphProperty prop in item.properties)
+                        {
+                            if (prop.Type != null)
+                            {
+                                writer.WriteStartElement("Property");
+                                writer.WriteAttributeString("Name", prop.Name);
+                                writer.WriteAttributeString("Type", (prop.Type as GraphIType).Name);
+                                if (string.IsNullOrEmpty(prop.Value) == false)
+                                    writer.WriteAttributeString("Value", prop.Value);
+                                writer.WriteEndElement();
+                            }
+                            else
+                            {
+                                writer.WriteStartElement("Property");
+                                writer.WriteAttributeString("Name", prop.Name);
+                                if (string.IsNullOrEmpty(prop.Value) == false)
+                                    writer.WriteAttributeString("Value", prop.Value);
+                                writer.WriteEndElement();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                    }
 
                     writer.WriteEndElement();                                      
                 }
@@ -1281,26 +1506,36 @@ namespace Aurora.SandboxDesigner.Controls
                             {
                                 if (connection.Source.Name == "Part_Out")
                                 {
+                                    var slist = sourceItem.properties.FindAll((e) => e.Name == ((GraphProperty)connection.Source.DataContext).Name);
+                                    var tlist = targetItem.properties.FindAll((e) => e.Name == ((GraphProperty)connection.Sink.DataContext).Name);
+                                    int sindex = slist.IndexOf((GraphProperty)connection.Source.DataContext);
+                                    int tindex = tlist.IndexOf( (GraphProperty)connection.Sink.DataContext );
+
                                     string sname = sourceItem.properties.Find((e) => e.Name == ((GraphProperty)connection.Source.DataContext).Name).Name;
                                     string tname = targetItem.properties.Find((e) => e.Name == ((GraphProperty)connection.Sink.DataContext).Name).Name;
                                     string stype = connection.Source.Name == "Part_Out" ? "Out" : "In";
                                     string ttype = connection.Sink.Name == "Part_Out" ? "Out" : "In";
 
-                                    writer.WriteAttributeString("Source", targetItem.NodeId.ToString("X") + "." + tname);
-                                    writer.WriteAttributeString("Target", sourceItem.NodeId.ToString("X") + "." + sname);
+                                    writer.WriteAttributeString("Source", targetItem.NodeId.ToString("X") + "." + tname + "." + tindex);
+                                    writer.WriteAttributeString("Target", sourceItem.NodeId.ToString("X") + "." + sname + "." + sindex);
                                     writer.WriteAttributeString("SourceType", ttype);
                                     writer.WriteAttributeString("TargetType", stype);
                                     writer.WriteAttributeString("Type", "Property");
                                 }
                                 else
                                 {
+                                    var slist = sourceItem.properties.FindAll((e) => e.Name == ((GraphProperty)connection.Source.DataContext).Name);
+                                    var tlist = targetItem.properties.FindAll((e) => e.Name == ((GraphProperty)connection.Sink.DataContext).Name);
+                                    int sindex = slist.IndexOf((GraphProperty)connection.Source.DataContext);
+                                    int tindex = tlist.IndexOf((GraphProperty)connection.Sink.DataContext);
+
                                     string sname = sourceItem.properties.Find((e) => e.Name == ((GraphProperty)connection.Source.DataContext).Name).Name;
                                     string tname = targetItem.properties.Find((e) => e.Name == ((GraphProperty)connection.Sink.DataContext).Name).Name;
                                     string stype = connection.Source.Name == "Part_Out" ? "Out" : "In";
                                     string ttype = connection.Sink.Name == "Part_Out" ? "Out" : "In";
 
-                                    writer.WriteAttributeString("Source", sourceItem.NodeId.ToString("X") + "." + sname);
-                                    writer.WriteAttributeString("Target", targetItem.NodeId.ToString("X") + "." + tname);
+                                    writer.WriteAttributeString("Source", sourceItem.NodeId.ToString("X") + "." + sname + "." + sindex);
+                                    writer.WriteAttributeString("Target", targetItem.NodeId.ToString("X") + "." + tname + "." + tindex);
                                     writer.WriteAttributeString("SourceType", stype);
                                     writer.WriteAttributeString("TargetType", ttype);
                                     writer.WriteAttributeString("Type", "Property");

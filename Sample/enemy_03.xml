@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="Windows-1252"?>
-<Flow>
+<Flow
+  Version="2">
   <Node
     Id="1953567F"
     Type="Signal"
@@ -10,55 +11,108 @@
     Id="1A595F0C"
     Type="Assert"
     Designer.Name="1a595f0c"
-    Message="Hello world"
     Designer.OffsetX="374"
-    Designer.OffsetY="402.04" />
+    Designer.OffsetY="402.04">
+    <Property
+      Name="Message"
+      Value="Hello world" />
+  </Node>
   <Node
     Id="19FA6024"
     Type="QueryLocationOfUnit"
     Designer.Name="19fa6024"
-    Unit="0"
-    Orientation="0 0 0 1"
-    Location="0 0 0"
     Designer.OffsetX="570"
-    Designer.OffsetY="446.04" />
+    Designer.OffsetY="446.04">
+    <Property
+      Name="Unit"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Orientation"
+      Type="quaternion"
+      Value="0 0 0 1" />
+    <Property
+      Name="Location"
+      Type="vector3"
+      Value="0 0 0" />
+  </Node>
   <Node
     Id="1A3BF530"
     Type="Spawn"
     Designer.Name="1a3bf530"
-    SpawnClass="explosion"
-    SpawnScale="1 1 1"
-    SpawnOrientation="0 0 0 1"
-    SpawnPoint="0 0 0"
     Designer.OffsetX="768"
-    Designer.OffsetY="457.04" />
+    Designer.OffsetY="457.04">
+    <Property
+      Name="SpawnClass"
+      Value="explosion" />
+    <Property
+      Name="SpawnScale"
+      Type="vector3"
+      Value="1 1 1" />
+    <Property
+      Name="SpawnOrientation"
+      Type="quaternion"
+      Value="0 0 0 1" />
+    <Property
+      Name="SpawnPoint"
+      Type="vector3"
+      Value="0 0 0" />
+  </Node>
   <Node
     Id="1B24AFEA"
     Type="GFXGetVariable"
     Designer.Name="1b24afea"
-    Movie="0"
-    Variable="score"
-    Value="0"
     Designer.OffsetX="955"
-    Designer.OffsetY="421.04" />
+    Designer.OffsetY="421.04">
+    <Property
+      Name="Movie"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Variable"
+      Value="score" />
+    <Property
+      Name="Value"
+      Type="int"
+      Value="0" />
+  </Node>
   <Node
     Id="1B867B5F"
     Type="GFXSetVariable"
     Designer.Name="1b867b5f"
-    Movie="0"
-    Variable="score"
-    Value="0"
     Designer.OffsetX="1363"
-    Designer.OffsetY="355.04" />
+    Designer.OffsetY="355.04">
+    <Property
+      Name="Movie"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="Variable"
+      Value="score" />
+    <Property
+      Name="Value"
+      Type="int"
+      Value="0" />
+  </Node>
   <Node
     Id="1C54259C"
     Type="AddInt32"
     Designer.Name="1c54259c"
-    A="0"
-    B="10"
-    C="0"
     Designer.OffsetX="1160"
-    Designer.OffsetY="395.04" />
+    Designer.OffsetY="395.04">
+    <Property
+      Name="A"
+      Type="int"
+      Value="0" />
+    <Property
+      Name="B"
+      Type="int"
+      Value="10" />
+    <Property
+      Name="C"
+      Type="int"
+      Value="0" />
+  </Node>
   <Connection
     Source="1A595F0C.In"
     Target="1953567F.Out"
@@ -80,14 +134,14 @@
     Target="1B24AFEA.Out"
     Type="Element" />
   <Connection
-    Source="1B867B5F.Value"
-    Target="1C54259C.C"
+    Source="1B867B5F.Value.0"
+    Target="1C54259C.C.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />
   <Connection
-    Source="1C54259C.A"
-    Target="1B24AFEA.Value"
+    Source="1C54259C.A.0"
+    Target="1B24AFEA.Value.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />
@@ -96,14 +150,14 @@
     Target="1C54259C.Out"
     Type="Element" />
   <Connection
-    Source="1A3BF530.SpawnOrientation"
-    Target="19FA6024.Orientation"
+    Source="1A3BF530.SpawnOrientation.0"
+    Target="19FA6024.Orientation.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />
   <Connection
-    Source="1A3BF530.SpawnPoint"
-    Target="19FA6024.Location"
+    Source="1A3BF530.SpawnPoint.0"
+    Target="19FA6024.Location.0"
     SourceType="In"
     TargetType="Out"
     Type="Property" />

@@ -635,6 +635,27 @@ void __cdecl method_getvariable(void* a, int signal)
 }
 
 
+void __cdecl method_gfxcall(void* a, int signal)
+{
+
+	method_setproperty<int>(a, 0) = method_getproperty<int>(a, 0);
+	method_compare_and_swap_token(a, 1, &method_releasetoken );
+	//method_setproperty<int>(a, 2) = method_getproperty<int>(a, 2);
+	//method_setproperty<int>(a, 3) = method_getproperty<int>(a, 3);
+	printf("gfx call\r\n");
+	printf("\t: %d\r\n", method_setproperty<int>(a, 0));
+	printf("\t: %s\r\n", (char*)method_gettoken(a, method_setproperty<unsigned int>(a, 1)));
+
+	int values = method_setproperty<int>(a, 2);
+	for( int i = 0; i < values; ++i ) {
+		printf("\t %d\r\n", method_setproperty<int>(a, 3 + i));
+	}
+	method_raise(a, 0);
+
+}
+
+
+
 
 void main(int argc, char** argv)
 {
@@ -685,7 +706,8 @@ void main(int argc, char** argv)
 	functionMapping[Delay::SymbolId] = &method_delay;
 	functionMapping[Assert::SymbolId] = &method_assert;
 	functionMapping[Concatenate::SymbolId] = &method_assert2;	
-	functionMapping[GFXGetVariable2::SymbolId] = &method_getvariable;
+	functionMapping[GFXGetVariable2::SymbolId] = &method_getvariable;	
+	functionMapping[GFXCall::SymbolId] = &method_gfxcall;
 	
 	
 
