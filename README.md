@@ -7,4 +7,4 @@ game. Supported platforms: Windows 32-bit, Visual Studio 2008, 2010.
 
 Dissertation:
 
-https://docs.google.com/file/d/0B8LpEdZ0qbtobmliNlk3aHBTdHM/edit?usp=sharing
+https://drive.google.com/file/d/0B8LpEdZ0qbtobmliNlk3aHBTdHM/view?usp=sharing&resourcekey=0-m64gx59HAgQNCM2vsCRT9A
